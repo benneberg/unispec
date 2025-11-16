@@ -1,0 +1,5 @@
+{
+  "name": "UniSpec",
+  "description": "An AI-powered tool to analyze, compare, and consolidate multiple application variants into a single, unified specification. Add variants from file uploads, GitHub repositories, or manual input to generate comprehensive documentation.",
+  "requestFramePermissions": []
+}
