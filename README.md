@@ -42,33 +42,34 @@ graph LR
     A[Multi-Apps] --> B[LLM Extract Specs]
     B --> C[Variant Compare/Reconcil]
     C --> D[PRD/Arch Gen]
-Quick Start (Magic Moment)
+```
+## Quick Start (Magic Moment)
 
 npx unispec merger apps/ --llm openai --out prd.md
 60s: Apps → merged specs/PRD.
 
-Graphic Profile
+## Graphic Profile
 
 Colors: Primary #f59e0b Tailwind.
 
-Quality Metrics
+## Quality Metrics
 
 Structure 94%, Docs 90%.
 
-Dependencies
+## Dependencies
 
 Type	Key	Status
 LLM	OpenAI	✅
 React/TS Vite	UI	✅
-Strategic Assumptions
+## Strategic Assumptions
 
 Assumption	Central	Val	Risk
 LLM specs accurate	Core	⚠️ Partial	High drift
 Challenged Assumptions
 
-Contradiction: "Cohesive design" vs variant diffs unresolved (RIE011).
+## Contradiction: "Cohesive design" vs variant diffs unresolved (RIE011).
 
-How to Use
+## How to Use
 
 Dev: Merger/Compare/Gen. PM: PRD/Arch outputs.
 
