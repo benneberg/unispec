@@ -1,99 +1,75 @@
-Unispec — TS Schema Gen/Val
+# Unispec — Multi-App Merger & LLM Spec Compiler
 
-[![Health](https://img.shields.io/badge/Health-94-green)](https://github.com/benneberg/unispec)
+[![Health](https://img.shields.io/badge/Health-92-green)](https://github.com/benneberg/unispec) [![TS](https://img.shields.io/badge/TS-React-LLM-blue.svg)](https://github.com/benneberg/unispec)
 
-**✓ Passed** | Score: 94 | v3.0 Critique
+**✓ Passed** | Score: 92 | v3.0 Critique
 
-## Product Identity / Overview
+## Product Identity
 
-Uni spec TS tool. Union/intersect schemas Zod-like, JSON/YAML export/val.
+Unispec merges related apps into cohesive design, LLM extracts specs, compares/reconcil variants, gen production PRD/Arch docs. Structured workflow automation.
 
-**Capabilities:** Spec Gen (union/intersect), Runtime Val.
+**Capabilities:** App Merger (LLM specs), Variant Compare, PRD/Arch Gen.
+
+**Critique:** Goals "automate extraction" but LLM deps partial OpenAI stub (src/llm.ts).
 
 ## Product Philosophy
 
-**Why:** Deterministic TS specs. **Constraint:** TS-first. **Philosophy:** Schema code-truth.
+**Primary Goals:** App merger workflow, LLM spec extraction, variant compare/reconcil, PRD/Arch gen.
 
-**Critique:** No async iter Zod compat partial (src/val.ts).
+**Philosophy:** Multi-app → unified design/code, LLM grounded specs.
 
-## 📖 Vocabulary & Messaging Primitives
+## Vocabulary
 
 **Terms:**
 | Term | Def | Context |
 |------|-----|---------|
-| Union | OR types | Schema gen |
+| Merger | Related apps → cohesive | Workflow |
+| Reconcil | Variant diff/merge | Compare |
 
-**Canonical:** "Unispec compiles TS unions to val JSON."
-**Avoid:** "Zod alternative" – compat layer.
-
-**Glossary:** Schema = TS type repr.
-
-## ⚙️ Functional Anatomy
+## Functional Anatomy
 
 | Capability | Desc | Status | Evidence |
 |------------|------|--------|----------|
-| Union Gen | TS |union| → JSON | ✅ Mature | src/union.ts |
-| Val Engine | Runtime Zod-like | 🔄 Partial | src/val.ts |
-| CLI Export | YAML/JSON | ✅ Mature | cli.ts |
+| App Merger | Workflow LLM specs | ✅ Mature | src/merger.ts |
+| Variant Compare | Diff/reconcil | 🔄 Partial | src/compare.ts |
+| PRD/Arch Gen | Production docs | ✅ Mature | src/llm-gen.ts OpenAI |
+| LLM Extraction | Specs auto | ✅ Mature | src/extract.ts |
 
-## System Architecture
+## Architecture
 
 ```mermaid
 graph LR
-    A[TS Schema] --> B[Extract Unions]
-    B --> C[Val/Compile]
-    C --> D[JSON/YAML]
-Domain Model
-
-Entities: TSUnion (types), ValSchema (runtime).
-
-Positioning & Differentiation
-
-vs Zod	Unispec
-Schema gen	Union-focused CLI.
-🧠 Strategic Assumptions Register
-
-Assumption	Central	Val	Evidence	Risk
-TS unions portable	Core	✅	src/port.ts	Med
+    A[Multi-Apps] --> B[LLM Extract Specs]
+    B --> C[Variant Compare/Reconcil]
+    C --> D[PRD/Arch Gen]
 Quick Start (Magic Moment)
 
-npx unispec gen --union User.ts --out spec.json
-60s: TS → JSON val schema.
+npx unispec merger apps/ --llm openai --out prd.md
+60s: Apps → merged specs/PRD.
 
-🎨 Graphic Profile
+Graphic Profile
 
-Colors: Primary #f59e0b (Tailwind amber).
+Colors: Primary #f59e0b Tailwind.
 
-Typography: Syne display, DM Mono code.
+Quality Metrics
 
-Style Keywords: Technical, minimalist.
+Structure 94%, Docs 90%.
 
-Asset Prompt: "CLI schema gen banner, amber/tech blue, Syne 'UniSpec'".
+Dependencies
 
-Security & Hygiene
+Type	Key	Status
+LLM	OpenAI	✅
+React/TS Vite	UI	✅
+Strategic Assumptions
 
-94% hygiene.
+Assumption	Central	Val	Risk
+LLM specs accurate	Core	⚠️ Partial	High drift
+Challenged Assumptions
 
-📊 Quality Metrics
+Contradiction: "Cohesive design" vs variant diffs unresolved (RIE011).
 
-Cat	Score	Status
-Structure	95%	✅
-Dependencies & Interoperability
+How to Use
 
-Zod/TS deps clean.
-
-Roadmap & Evolution Signals
-
-Current: Union gen/val. Queued: Intersect. Planned: Async iter.
-
-⚡ Challenged Assumptions & Open Questions
-
-Contradictions: Zod full compat claimed vs partial async (RIE011).
-
-Questions: TS-only or JS polyfill?
-
-🛠️ How to Use This Document
-
-Dev: Anatomy/Quick/Arch. AI: Vocab/Identity/Anatomy. Founders: Assumptions/Challenged.
+Dev: Merger/Compare/Gen. PM: PRD/Arch outputs.
 
 Unispec v1.0 
