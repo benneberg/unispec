@@ -1,6 +1,8 @@
 
-import React, { createContext, useContext, useReducer, Dispatch } from 'react';
+import React, { createContext, useContext, useReducer, Dispatch, useEffect } from 'react';
 import { type Workspace, type Variant, type ComparisonData, type ConsolidatedDocs, type NormalizationResult } from '../types';
+
+const STORAGE_KEY = 'unispec_workspace_state';
 
 type AgentStatus = 'idle' | 'analyzing' | 'comparing_normalizing' | 'consolidating' | 'generating_visuals' | 'validating' | 'complete' | 'error';
 
@@ -166,7 +168,46 @@ const WorkspaceContext = createContext<{
 } | undefined>(undefined);
 
 export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [state, dispatch] = useReducer(workspaceReducer, initialState);
+  const [state, dispatch] = useReducer(workspaceReducer, initialState, (initial) => {
+    if (typeof window === 'undefined') return initial;
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Load only state and workspaces, reset transient states
+        return { 
+            ...initial, 
+            ...parsed, 
+            loading: false, 
+            error: null, 
+            agentStatus: 'idle' 
+        };
+      } catch (e) {
+        console.error("Failed to load state from localStorage:", e);
+      }
+    }
+    return initial;
+  });
+
+  useEffect(() => {
+    const { 
+        workspaces, 
+        currentWorkspace, 
+        comparisonData, 
+        normalizationResult, 
+        consolidatedDocs, 
+        activeStep 
+    } = state;
+    
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+       workspaces, 
+       currentWorkspace, 
+       comparisonData, 
+       normalizationResult, 
+       consolidatedDocs, 
+       activeStep 
+    }));
+  }, [state]);
 
   const value = { state, dispatch };
 

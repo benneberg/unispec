@@ -1,5 +1,6 @@
 
 import React from 'react';
+import Markdown from 'react-markdown';
 import { Download, Loader2, MessageSquare, ShieldCheck } from './Icons';
 import { type ConsolidatedDocs } from '../types';
 import ArchitectureDiagrams from './ArchitectureDiagrams';
@@ -57,11 +58,11 @@ const ConsolidatedDocsDisplay: React.FC<ConsolidatedDocsDisplayProps> = ({ docs,
                 {Object.entries(textDocs).map(([key, value]) => {
                     if (!value) return null;
                     return (
-                        <div key={key} className="bg-slate-900 p-4 rounded-lg">
+                        <div key={key} className="bg-slate-900 p-4 rounded-lg flex flex-col">
                             <h4 className="font-bold text-purple-400 mb-2 capitalize">{key.replace(/([A-Z])/g, ' $1')}</h4>
-                            <pre className="text-xs overflow-auto max-h-40 text-slate-300 whitespace-pre-wrap">
-                            {String(value).substring(0, 500)}...
-                            </pre>
+                            <div className="text-xs overflow-auto max-h-60 text-slate-300 prose prose-invert prose-xs scrollbar-thin scrollbar-thumb-purple-500/20">
+                                <Markdown>{String(value)}</Markdown>
+                            </div>
                         </div>
                     )
                 })}

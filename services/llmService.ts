@@ -3,9 +3,6 @@ import { type ApiConfig, type Variant, type ComparisonData, type ExtractedSpecs,
 async function performApiCall(prompt: string, apiConfig: ApiConfig, expectJson: boolean = true): Promise<any> {
   const { provider, apiKey, model } = apiConfig;
 
-  let url: string;
-  let headers: HeadersInit;
-  
   const body: { [key: string]: any } = {
       model,
       messages: [{ role: 'user', content: prompt }],
@@ -17,46 +14,58 @@ async function performApiCall(prompt: string, apiConfig: ApiConfig, expectJson: 
       body.response_format = { type: "json_object" };
   }
 
-  if (provider === 'groq') {
-    url = 'https://api.groq.com/openai/v1/chat/completions';
-    headers = {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    };
-  } else { // openrouter
-    url = 'https://openrouter.ai/api/v1/chat/completions';
-    headers = {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': window.location.origin, // Required by OpenRouter
-      'X-Title': 'App Merger Studio', // Recommended by OpenRouter
-    };
-  }
+  let lastError: any = null;
+  const retries = 2; // Total attempts = 3
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(body),
-  });
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      // Call the backend proxy
+      const response = await fetch('/api/llm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          provider,
+          apiKey,
+          body
+        }),
+      });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error?.message || `API request failed with status ${response.status}`);
-  }
-
-  const data = await response.json();
-  const content = data.choices[0].message.content;
-  
-  if (expectJson) {
-      try {
-        return JSON.parse(content);
-      } catch (e) {
-        console.error("Failed to parse JSON response:", content);
-        return { raw: content }; 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `API request failed with status ${response.status}`);
       }
-  } else {
-    return content;
+
+      const data = await response.json();
+      const content = data.choices[0].message.content;
+      
+      if (expectJson) {
+          try {
+            // Attempt to clean the content if LLM included markdown wrappers
+            const cleanedContent = content.trim().replace(/^```json\n?/, '').replace(/\n?```$/, '');
+            return JSON.parse(cleanedContent);
+          } catch (e) {
+            console.warn(`Attempt ${attempt + 1}/${retries + 1} failed to parse JSON. Content sub: ${content.substring(0, 100)}...`);
+            lastError = e;
+            if (attempt < retries) continue; // Try again
+            return { raw: content, parseError: true }; 
+          }
+      } else {
+        return content;
+      }
+    } catch (err) {
+      lastError = err;
+      if (attempt < retries) {
+        // Add a delay before retry
+        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+        continue;
+      }
+      throw err;
+    }
   }
+  
+  throw lastError || new Error("API call failed after retries");
 }
 
 // Pass 0: Repository Summary
