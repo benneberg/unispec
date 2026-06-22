@@ -17,39 +17,41 @@ const VariantCard: React.FC<VariantCardProps> = ({ variant, onDelete, onExtract,
   const isAnalysisInProgress = variant.extractionProgress > 0 && variant.extractionProgress < variant.totalExtractionSteps;
 
   return (
-    <div className="bg-slate-900 rounded-lg p-4 border border-slate-700">
+    <div className="bg-white/80 rounded-2xl p-5 border border-slate-200/50 hover:border-blue-200/50 transition-all group">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <FileCode className="w-5 h-5 text-purple-400 flex-shrink-0" />
-            <h4 className="font-bold text-lg break-all">{variant.name}</h4>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 group-hover:text-blue-500 group-hover:bg-blue-50 transition-all">
+              <FileCode className="w-5 h-5 flex-shrink-0" />
+            </div>
+            <div>
+              <h4 className="font-bold text-slate-800 break-all">{variant.name}</h4>
+              <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">
+                {variant.sourceType} • {variant.fileName || variant.repo || 'Source'}
+              </p>
+            </div>
             {isAnalysisComplete && (
-              <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full whitespace-nowrap">
-                Analyzed
+              <span className="ml-2 px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-wider rounded-md">
+                Verified
               </span>
             )}
           </div>
-          <p className="text-sm text-slate-400 capitalize">
-            Source: {variant.sourceType}
-            {variant.fileName && ` • File: ${variant.fileName}`}
-            {variant.repoUrl && ` • Repo: ${variant.repo}`}
-          </p>
         </div>
         <div className="flex gap-2 self-end sm:self-center">
-          <button onClick={onView} className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg" title="View details">
+          <button onClick={onView} className="w-10 h-10 flex items-center justify-center soft-button rounded-xl text-slate-600 hover:text-blue-600" title="View details">
             <Eye className="w-4 h-4" />
           </button>
           {!isAnalysisComplete && (
             <button 
               onClick={onExtract} 
               disabled={loading || isAnalysisInProgress || isAgentRunning} 
-              className="px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold disabled:opacity-30 disabled:cursor-not-allowed hover:bg-black transition-all"
             >
-              {isAnalysisInProgress ? 'Analyzing...' : 'Run Analysis'}
+              {isAnalysisInProgress ? 'Processing...' : 'Decompose'}
             </button>
           )}
-          <button onClick={onDelete} className="p-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg" title="Delete">
-            <Trash2 className="w-4 h-4 text-red-400" />
+          <button onClick={onDelete} className="w-10 h-10 flex items-center justify-center bg-rose-50 hover:bg-rose-100 rounded-xl transition-all" title="Delete">
+            <Trash2 className="w-4 h-4 text-rose-500" />
           </button>
         </div>
       </div>

@@ -36,28 +36,48 @@ const AgentControl: React.FC<AgentControlProps> = ({ status, log, onStart, varia
   const { icon, text, color } = getStatusInfo();
 
   return (
-    <div className="bg-slate-800/50 rounded-xl p-6 border border-purple-500/20">
-      <h3 className="text-xl font-bold mb-4">Autonomous Workflow</h3>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
-        <button
-          onClick={onStart}
-          disabled={status !== 'idle'}
-          className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-        >
-          <Play className="w-5 h-5" />
-          Start Workflow
-        </button>
-        <div className={`flex items-center gap-2 font-medium ${color}`}>
-          {icon}
-          <span>{text}</span>
+    <div className="soft-out rounded-[32px] p-8 bg-white/40">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+        <div>
+           <h3 className="text-xl font-black font-display text-slate-800">Orchestration Controller</h3>
+           <p className="text-sm text-slate-500 font-medium">Lifecycle management for autonomous analysis</p>
+        </div>
+        <div className="flex items-center gap-4">
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-xl bg-white soft-button font-bold text-xs uppercase tracking-wider ${color}`}>
+              {icon}
+              <span>{text}</span>
+            </div>
+            <button
+              onClick={onStart}
+              disabled={status !== 'idle'}
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold tracking-tight disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-3 shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
+            >
+              <Play className="w-5 h-5 fill-current" />
+              <span>Initiate Stack</span>
+            </button>
         </div>
       </div>
-      <div className="bg-slate-900 rounded p-4 max-h-48 overflow-y-auto">
-        <h4 className="text-sm font-semibold mb-2 text-slate-400">Agent Log:</h4>
-        <div className="text-xs text-slate-300 space-y-1">
-          {log.map((entry, index) => (
-            <p key={index} className="whitespace-pre-wrap font-mono">{`[${new Date().toLocaleTimeString()}] ${entry}`}</p>
-          ))}
+      
+      <div className="soft-in rounded-2xl p-6 bg-slate-50 relative">
+        <div className="flex items-center gap-2 mb-4">
+             <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+             <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+             <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+             <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Console Output</h4>
+        </div>
+        <div className="max-h-48 overflow-y-auto space-y-2 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent pr-2">
+          {log.length === 0 ? (
+            <p className="text-[10px] italic text-slate-300 font-mono">Standby for orchestration logs...</p>
+          ) : (
+            log.map((entry, index) => (
+              <div key={index} className="flex gap-4 group">
+                <span className="text-[9px] text-slate-300 font-mono mt-1 opacity-50 select-none">{new Date().toLocaleTimeString()}</span>
+                <p className="text-xs text-slate-600 font-medium font-mono leading-relaxed group-hover:text-blue-600 transition-colors">
+                  {entry}
+                </p>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

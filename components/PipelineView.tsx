@@ -16,56 +16,50 @@ const PipelineNode: React.FC<PipelineNodeProps> = ({ title, status, icon, descri
     switch (status) {
       case 'complete':
         return {
-          ring: 'ring-green-500',
-          bg: 'bg-green-500/10',
-          iconBg: 'bg-green-500',
-          text: 'text-green-300',
+          ring: 'border-emerald-200 bg-emerald-50',
+          dot: 'bg-emerald-500',
+          text: 'text-emerald-700',
+          desc: 'text-emerald-600/70',
         };
       case 'in-progress':
         return {
-          ring: 'ring-purple-500 animate-pulse',
-          bg: 'bg-purple-500/10',
-          iconBg: 'bg-purple-500',
-          text: 'text-purple-300',
+          ring: 'border-blue-200 bg-blue-50 animate-pulse',
+          dot: 'bg-blue-500',
+          text: 'text-blue-700',
+          desc: 'text-blue-600/70',
         };
       case 'error':
          return {
-          ring: 'ring-red-500',
-          bg: 'bg-red-500/10',
-          iconBg: 'bg-red-500',
-          text: 'text-red-300',
+          ring: 'border-rose-200 bg-rose-50',
+          dot: 'bg-rose-500',
+          text: 'text-rose-700',
+          desc: 'text-rose-600/70',
         };
       case 'pending':
       default:
         return {
-          ring: 'ring-slate-700',
-          bg: 'bg-slate-900/50',
-          iconBg: 'bg-slate-700',
-          text: 'text-slate-400',
+          ring: 'border-slate-200 bg-slate-50 opacity-60',
+          dot: 'bg-slate-300',
+          text: 'text-slate-700',
+          desc: 'text-slate-400',
         };
     }
   };
 
   const styles = getStatusStyles();
 
-  const StatusIcon = () => {
-      switch (status) {
-          case 'in-progress': return <Loader2 className="w-4 h-4 text-white animate-spin" />;
-          case 'complete': return <Check className="w-4 h-4 text-white" />;
-          case 'error': return <AlertTriangle className="w-4 h-4 text-white" />;
-          default: return icon;
-      }
-  }
-
   return (
-    <div className={`flex-1 min-w-[150px] p-4 rounded-lg border border-transparent ring-2 ${styles.ring} ${styles.bg} transition-all duration-300`}>
-      <div className="flex items-center gap-3">
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${styles.iconBg} flex-shrink-0`}>
-            <StatusIcon />
+    <div className={`flex-1 min-w-[140px] p-5 rounded-2xl border ${styles.ring} transition-all duration-500 hover:scale-[1.02]`}>
+      <div className="flex flex-col gap-3">
+        <div className="flex justify-between items-start">
+             <div className={`w-2 h-2 rounded-full ${styles.dot}`}></div>
+             {status === 'complete' && <Check className="w-3 h-3 text-emerald-500" />}
+             {status === 'in-progress' && <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />}
+             {status === 'error' && <AlertTriangle className="w-3 h-3 text-rose-500" />}
         </div>
         <div>
-            <h4 className="font-bold text-white">{title}</h4>
-            <p className={`text-xs ${styles.text}`}>{description}</p>
+            <h4 className={`text-sm font-black uppercase tracking-wider ${styles.text}`}>{title}</h4>
+            <p className={`text-[10px] font-bold mt-1 ${styles.desc}`}>{description}</p>
         </div>
       </div>
     </div>
@@ -105,7 +99,7 @@ const PipelineView: React.FC<PipelineViewProps> = ({ workspace, agentStatus, err
                 if (agentStatus === 'analyzing') return 'in-progress';
                 return 'pending';
             case 'compare':
-                if (workspace.consolidatedSpecs?.migration) return 'complete'; // A proxy for whole flow being done
+                if (workspace.consolidatedSpecs?.migration) return 'complete'; 
                 if (consolidatedSpecs) return 'complete';
                 if (agentStatus === 'comparing_normalizing') return 'in-progress';
                 return 'pending';
@@ -132,25 +126,22 @@ const PipelineView: React.FC<PipelineViewProps> = ({ workspace, agentStatus, err
         }
     }
 
-    const Connector = () => <ChevronRight className="w-6 h-6 text-slate-600 hidden lg:block" />;
-
     return (
-        <div className="bg-slate-800/50 rounded-xl p-4 sm:p-6 border border-purple-500/20">
-            <h3 className="text-xl font-bold mb-4">Workflow Pipeline</h3>
-            <div className="flex flex-col lg:flex-row items-stretch justify-center gap-2 sm:gap-4">
-               <PipelineNode title="Input" description={`${variants.length} Variants`} status={getStatus('input')} icon={<FileText className="w-4 h-4 text-white" />} />
-               <Connector />
-               <PipelineNode title="Analyze" description="Extract Specs" status={getStatus('analyze')} icon={<Zap className="w-4 h-4 text-white" />} />
-               <Connector />
-               <PipelineNode title="Compare" description="Normalize Models" status={getStatus('compare')} icon={<GitMerge className="w-4 h-4 text-white" />} />
-               <Connector />
-               <PipelineNode title="Consolidate" description="Generate Docs" status={getStatus('consolidate')} icon={<FileCog className="w-4 h-4 text-white" />} />
-               <Connector />
-               <PipelineNode title="Visualize" description="Create Diagrams" status={getStatus('visualize')} icon={<Palette className="w-4 h-4 text-white" />} />
-               <Connector />
-               <PipelineNode title="Validate" description="Check Fidelity" status={getStatus('validate')} icon={<ShieldCheck className="w-4 h-4 text-white" />} />
-               <Connector />
-               <PipelineNode title="Output" description="Export Results" status={getStatus('output')} icon={<Download className="w-4 h-4 text-white" />} />
+        <div className="soft-out rounded-3xl p-8 bg-white/40">
+            <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Analysis Pipeline</h3>
+                <div className="px-3 py-1 bg-white soft-button rounded-full text-[10px] font-bold text-slate-500">
+                    Auto-Orchestration Active
+                </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+               <PipelineNode title="Input" description={`${variants.length} Sources`} status={getStatus('input')} icon={<FileText className="w-4 h-4" />} />
+               <PipelineNode title="Decon" description="Extract Traits" status={getStatus('analyze')} icon={<Zap className="w-4 h-4" />} />
+               <PipelineNode title="Align" description="Synthesize" status={getStatus('compare')} icon={<GitMerge className="w-4 h-4" />} />
+               <PipelineNode title="Merge" description="Unify Context" status={getStatus('consolidate')} icon={<FileCog className="w-4 h-4" />} />
+               <PipelineNode title="Graph" description="Architecture" status={getStatus('visualize')} icon={<Palette className="w-4 h-4" />} />
+               <PipelineNode title="Audit" description="Logic Check" status={getStatus('validate')} icon={<ShieldCheck className="w-4 h-4" />} />
+               <PipelineNode title="Ship" description="Ready Bundle" status={getStatus('output')} icon={<Download className="w-4 h-4" />} />
             </div>
         </div>
     );

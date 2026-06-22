@@ -414,30 +414,32 @@ const AppContent: React.FC = () => {
   const isAgentRunning = agentStatus !== 'idle' && agentStatus !== 'complete' && agentStatus !== 'error';
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-purple-500/20 bg-black/20 backdrop-blur sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <GitBranch className="w-8 h-8 text-purple-400" />
+    <div className="min-h-screen font-sans selection:bg-blue-100 selection:text-blue-900">
+      <header className="border-b border-slate-200/60 bg-[#F0F2F5]/80 backdrop-blur-md sticky top-0 z-20">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 flex items-center justify-center rounded-2xl soft-out bg-white">
+              <GitBranch className="w-6 h-6 text-blue-600" />
+            </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold">App Merger Studio</h1>
-              <p className="text-xs sm:text-sm text-purple-300">Unify Multiple Apps into One Spec</p>
+              <h1 className="text-xl sm:text-2xl font-bold font-display tracking-tight text-slate-800">UniSpec</h1>
+              <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400">Merger Studio</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
                 onClick={() => setShowAboutModal(true)}
-                className="p-2.5 bg-slate-700 hover:bg-slate-600 rounded-lg"
+                className="w-10 h-10 flex items-center justify-center soft-button rounded-xl text-slate-600 hover:text-blue-600"
                 aria-label="About App Merger Studio"
             >
                 <Info className="w-5 h-5" />
             </button>
             <button
               onClick={() => setShowApiConfig(true)}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg flex items-center gap-2 text-sm sm:text-base"
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg shadow-blue-500/20 flex items-center gap-2 text-sm font-semibold transition-all active:scale-95"
             >
-              <Zap className="w-4 h-4" />
-              Configure API
+              <Zap className="w-4 h-4 fill-current" />
+              <span>Configure Engine</span>
             </button>
           </div>
         </div>
@@ -476,14 +478,23 @@ const AppContent: React.FC = () => {
 
       {error && <ErrorMessage message={error} onClose={() => setError(null)} />}
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-10">
         {!currentWorkspace ? (
           <WorkspaceSetup onCreateWorkspace={(name) => dispatch({ type: 'CREATE_WORKSPACE', payload: name })} />
         ) : (
-          <div className="space-y-6">
-            <div className="bg-slate-800/50 rounded-xl p-6 border border-purple-500/20">
-              <h2 className="text-2xl font-bold mb-2">{currentWorkspace.name}</h2>
-              <p className="text-purple-300">Variants: {currentWorkspace.variants.length}</p>
+          <div className="space-y-10">
+            <div className="soft-out rounded-3xl p-8 bg-white/50 relative overflow-hidden">
+               <div className="absolute top-0 right-0 p-8">
+                  <div className="text-right">
+                    <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">Active Portfolio</p>
+                    <p className="text-2xl font-black font-display text-blue-600">{currentWorkspace.variants.length}</p>
+                  </div>
+               </div>
+              <h2 className="text-3xl font-black font-display tracking-tight text-slate-800 mb-2">{currentWorkspace.name}</h2>
+              <div className="flex items-center gap-2">
+                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                 <p className="text-sm font-medium text-slate-500">Workspace ready for analysis</p>
+              </div>
             </div>
             
             <PipelineView 
@@ -512,19 +523,22 @@ const AppContent: React.FC = () => {
             )}
 
             {currentWorkspace.variants.length > 0 && (
-              <div className="bg-slate-800/50 rounded-xl p-6 border border-purple-500/20">
-                <div className="flex flex-wrap justify-between items-center mb-4 gap-4">
-                  <h3 className="text-xl font-bold">Variants</h3>
+              <div className="soft-out rounded-3xl p-8 bg-white/30">
+                <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-800">Application Variants</h3>
+                    <p className="text-sm text-slate-500">Add or manage source variants for merging</p>
+                  </div>
                   {activeStep === 1 && (
                     <button
                       onClick={() => dispatch({ type: 'SET_ACTIVE_STEP', payload: 2 })}
-                      className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg"
+                      className="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0"
                     >
-                      Continue to Spec Analysis
+                      Process & Analyze
                     </button>
                   )}
                 </div>
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 gap-4">
                   {currentWorkspace.variants.map(variant => (
                     <VariantCard
                       key={variant.id}

@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  
+  --color-soft-bg: #F0F2F5;
+  --color-soft-shadow-dark: #D1D9E6;
+  --color-soft-shadow-light: #FFFFFF;
+  
+  --color-premium-slate: #1A1C1E;
+  --color-premium-acc: #3B82F6;
+  --color-premium-border: #E2E8F0;
+}
+
+@layer utilities {
+  .soft-out {
+    background: #F0F2F5;
+    box-shadow: 9px 9px 16px #D1D9E6, -9px -9px 16px #FFFFFF;
+  }
+  
+  .soft-in {
+    background: #F0F2F5;
+    box-shadow: inset 6px 6px 12px #D1D9E6, inset -6px -6px 12px #FFFFFF;
+  }
+
+  .soft-button {
+    background: #F0F2F5;
+    box-shadow: 4px 4px 8px #D1D9E6, -4px -4px 8px #FFFFFF;
+    transition: all 0.2s ease;
+  }
+
+  .soft-button:active {
+    box-shadow: inset 4px 4px 8px #D1D9E6, inset -4px -4px 8px #FFFFFF;
+    transform: scale(0.98);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+}
+
+body {
+  background-color: #F0F2F5;
+  color: #1A1C1E;
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+}
