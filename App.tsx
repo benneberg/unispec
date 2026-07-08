@@ -79,7 +79,7 @@ const AppContent: React.FC = () => {
   };
 
   const handleGithubClone = async (repoUrl: string, variantName: string) => {
-    setLoading(true, 'Cloning repository...');
+    setLoading(true, 'Cloning repository via secure backend service...');
     setError(null);
     try {
       const match = repoUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
@@ -88,51 +88,27 @@ const AppContent: React.FC = () => {
       const [, owner, repo] = match;
       const cleanRepo = repo.replace('.git', '');
       
-      const repoInfoRes = await fetch(`https://api.github.com/repos/${owner}/${cleanRepo}`);
-      if (!repoInfoRes.ok) throw new Error(`Could not fetch repo info. Status: ${repoInfoRes.status}`);
-      const repoInfo = await repoInfoRes.json();
-      const defaultBranch = repoInfo.default_branch;
+      const response = await fetch('/api/github/clone', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ owner, repo: cleanRepo })
+      });
 
-      const treeRes = await fetch(`https://api.github.com/repos/${owner}/${cleanRepo}/git/trees/${defaultBranch}?recursive=1`);
-      if (!treeRes.ok) throw new Error(`Could not fetch repo file tree. Status: ${treeRes.status}`);
-      const treeData = await treeRes.json();
-      
-      if (treeData.truncated) {
-        console.warn('Repository tree is truncated by GitHub API. Not all files will be processed.');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Cloning failed with status: ${response.status}`);
       }
 
-      const filesToFetch = treeData.tree
-        .filter((item: { type: string, path: string }) => item.type === 'blob' && !/\.(jpg|jpeg|png|gif|svg|ico|woff|woff2|ttf|eot|pdf|zip|gz|lock|DS_Store)$/i.test(item.path))
-        .slice(0, 75); // Limit to 75 files
-
-      const fileContents: { [key: string]: string } = {};
-
-      await Promise.all(filesToFetch.map(async (file: { url: string, path: string }) => {
-        const fileRes = await fetch(file.url);
-        if (!fileRes.ok) {
-          console.warn(`Could not fetch file: ${file.path}`);
-          return;
-        }
-        const blobData = await fileRes.json();
-        if (blobData.encoding === 'base64') {
-          try {
-            const decodedContent = atob(blobData.content);
-            fileContents[file.path] = decodedContent;
-          } catch (e) {
-            console.error(`Error decoding base64 content for ${file.path}`, e);
-            fileContents[file.path] = "[Error: Could not decode content]";
-          }
-        } else if (blobData.content) {
-          fileContents[file.path] = blobData.content;
-        }
-      }));
+      const cloneResult = await response.json();
 
       dispatch({
         type: 'ADD_VARIANT',
         payload: {
           name: variantName || cleanRepo,
           sourceType: 'github',
-          rawContent: JSON.stringify(fileContents, null, 2),
+          rawContent: JSON.stringify(cloneResult.files, null, 2),
           repoUrl,
           owner,
           repo: cleanRepo

@@ -1,44 +1,36 @@
 # ARCHITECTURE
 
 ## HIGH-LEVEL ARCHITECTURE
-UniSpec is built as a **Client-Side Heavy SPA (Single Page Application)** using React. It leverages an autonomous agent pattern where the frontend manages long-running "Analysis Pipelines" by orchestrating sequential calls to Large Language Models (LLMs).
+UniSpec is built as a **Full-Stack Application** utilizing a React frontend styled with Tailwind CSS (featuring a premium corporate mobile-first layout) and powered by an **Express (Node.js)** backend server. This architecture ensures high performance, client-side rate limit relief, and enhanced security for API key operations.
 
 ## COMPONENT BREAKDOWN
-- **View Layer**: React + Tailwind CSS.
-- **State Management**: `WorkspaceContext` (React Context API + `useReducer`). Handles the lifecycle of "Variants", "Agent Logs", and "Final Docs".
+- **Frontend View Layer**: React 19 + Tailwind CSS + Lucide Icons. Layout designed under a high-contrast corporate theme.
+- **State Management**: `WorkspaceContext` (React Context API + `useReducer`) with **LocalStorage Synchronization** to persist workspace portfolios across browser sessions.
 - **Service Layer**:
-    - `llmService.ts`: Core logic for prompt engineering and LLM orchestration.
-    - `geminiService.ts`: (Orphaned/Legacy) Google Generative AI integration.
-- **Autonomous Agent**: Managed via `useEffect` hooks in `App.tsx` that transition through `AgentStatus` states (`idle`, `extracting`, `comparing`, `normalizing`, `consolidating`).
+    - `llmService.ts`: Core logic for prompt engineering and LLM orchestration, proxying all external requests through the Express backend `/api/llm` endpoint.
+    - `server.ts`: Node.js Express server acting as a middleware and proxy endpoint for LLM completion requests and GitHub cloning.
+- **Autonomous Agent**: Orchestrated using a custom `useAgent` hook that manages the transitions through `AgentStatus` states (`idle`, `extracting`, `comparing`, `normalizing`, `consolidating`).
 
 ## DATA FLOW
-1. **Input**: User adds a `Variant` (Name + Raw Source).
-2. **Extraction Stage**: Parallel `extraction` passes for each variant.
+1. **Input**: User adds a `Variant` (Name + Raw Source) via file upload, manual payload, or secure GitHub cloning.
+2. **GitHub Ingress**: The backend `/api/github/clone` recursively fetches the tree, handles rate limits gracefully (utilizing optional `GITHUB_TOKEN` credentials on the server), applies file classifications, and streams content back to the client.
+3. **Extraction Stage**: Automated extraction passes for each variant:
     - Low-level (Features/UI) -> Mid-level (Logic/Flow) -> High-level (Architecture/Intent).
-3. **Comparison Stage**: Aggregates extracted specs into a "Comparison Prompt" to identify deltas.
-4. **Resolution Stage**: A "Normalizer" pass handles conflict resolution.
-5. **Synthesis Stage**: Generates the final "Master Specification".
-- **Source of Truth**: Volatile memory (`WorkspaceState`). No persistence (LocalStorage/DB) is currently implemented.
+4. **Comparison Stage**: Aggregates extracted specs into a "Comparison Prompt" to identify deltas.
+5. **Resolution Stage**: A "Normalizer" pass handles conflict resolution.
+6. **Synthesis Stage**: Generates the final "Master Specification".
+7. **Storage**: Current Portfolios are synchronized with `localStorage`.
 
 ## EXTERNAL INTEGRATIONS
-- **GitHub API**: Used for recursive file tree discovery and content fetching (`atob` decoding).
-- **LLM Providers**: Direct browser-to-API calls (Groq / OpenRouter / OpenAI compatible).
-- **Mermaid.js**: (Injected via CDN in `index.html`) for diagram rendering.
+- **GitHub Proxy Service**: Recursive file tree discovery and server-side parallel fetching with a 300-file threshold.
+- **Secure LLM Proxy Service**: Requests are proxied via `/api/llm` to OpenRouter or Groq, keeping keys safe.
+- **Mermaid.js**: Visually renders diagrams of specifications dynamically.
 
 ## DEPLOYMENT MODEL
-- **Platform**: Hosted via Vite (Static assets).
-- **Infrastructure**: Designed for serverless deployment (Cloud Run / Vercel), but currently lacks a production-ready backend for secret management.
+- **Framework**: Vite handles the frontend build pipeline, producing static assets in `dist/`.
+- **Backend Build**: `esbuild` bundles `server.ts` into a standalone, optimized CommonJS `dist/server.cjs` file.
+- **Runtime**: Runs on Node.js using `npm start`, ideal for modern container hosting such as Google Cloud Run.
 
 ## OBSERVABILITY MODEL
-- **Status Logging**: An `agentLog` array in the state captures timestamps and pipeline transitions.
-- **Progress Tracking**: Percentages are calculated based on pipeline stages (e.g., 5 stages = 20% increments).
-
-## ARCHITECTURAL RISKS
-- **Secret Hygiene (Critical)**: API keys are stored in component state and sent in cleartext headers from the browser.
-- **Memory Pressure**: Stringifying multiple 75-file repositories into a single React state object will lead to performance degradation on long-lived sessions.
-- **No Error Boundary**: Exceptions in the LLM response parsing (non-JSON responses) can halt the entire autonomous agent if not handled gracefully.
-
-## RECOMMENDED IMPROVEMENTS
-- **Move to Full-Stack**: Implement an Express/Node.js backend to handle GitHub proxying and LLM calls.
-- **Vector Storage**: For larger repositories, replace raw string injection with a RAG (Retrieval-Augmented Generation) approach to fit within context windows.
-- **Durable Persistence**: Integrate Firestore to allow users to save and share workspaces.
+- **Status Logging**: An `agentLog` array captures real-time orchestration timestamps and pipeline status.
+- **Console Output**: A premium responsive dashboard showing real-time feedback and execution traces.
