@@ -6,8 +6,7 @@ import { useWorkspace } from '../contexts/WorkspaceContext';
 import JSZip from 'jszip';
 import { 
   GitMerge, Sparkles, Loader2, Info, AlertTriangle, 
-  CheckCircle, FileCode, Copy, Download, Box, 
-  ChevronRight, ClipboardList, Cable, AlertCircle
+  CheckCircle, Copy, Download, Box
 } from './Icons';
 
 interface UnifierToolDisplayProps {
@@ -145,21 +144,21 @@ ${bundleResult.installNotes}
   };
 
   return (
-    <div className="bg-slate-800/40 rounded-xl p-6 border border-purple-500/20 space-y-6" id="unifier-tool-root">
+    <div className="bg-white border-2 border-black rounded-none p-6 md:p-8 space-y-6 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]" id="unifier-tool-root">
       {/* Tool Header */}
-      <div className="flex flex-wrap justify-between items-start gap-4 border-b border-slate-700 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-black pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded text-xs uppercase font-mono font-bold tracking-wider">
-              UniSpec Tool
+            <span className="bg-black text-white px-2.5 py-1 text-[9px] font-mono font-bold uppercase tracking-wider">
+              UNISPEC_CORE.UNIFIER
             </span>
-            <h3 className="text-xl font-bold flex items-center gap-2 text-slate-100">
-              <GitMerge className="w-5 h-5 text-purple-400" />
-              Unified Portfolio Integrator (The Unifier)
+            <h3 className="text-lg font-bold font-display uppercase tracking-tight text-black flex items-center gap-2">
+              <GitMerge className="w-5 h-5 text-[#FF5500]" />
+              Unified Portfolio Integrator
             </h3>
           </div>
-          <p className="text-sm text-slate-400 mt-1">
-            Grades, resolves, and maps multi-variant codebases into a single consolidated implementation blueprint.
+          <p className="text-xs text-neutral-500 mt-1 uppercase font-mono">
+            [MODE = AUTO_CONSOLIDATE_BLUEPRINT]
           </p>
         </div>
       </div>
@@ -167,36 +166,36 @@ ${bundleResult.installNotes}
       {/* Mode Selector and Setup */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Left column: Setup Config */}
-        <div className="lg:col-span-1 bg-slate-900/60 p-5 rounded-xl border border-slate-800 space-y-4">
-          <h4 className="text-sm font-semibold uppercase text-slate-300 tracking-wider flex items-center gap-2">
-            <Box className="w-4 h-4 text-purple-400" />
-            1. Configure Standalone Isolation
+        <div className="lg:col-span-1 bg-neutral-50 border-2 border-black p-5 rounded-none space-y-4">
+          <h4 className="text-xs font-mono font-bold uppercase text-black tracking-wider flex items-center gap-2">
+            <Box className="w-4 h-4 text-black" />
+            1. Configure Isolation
           </h4>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            Select high-reusability components from the registry that you explicitly wish to decouple as independent shared packages instead of merging.
+          <p className="text-xs text-neutral-600 leading-relaxed font-sans">
+            Select high-reusability components from the registry to decouple as independent shared packages instead of merging.
           </p>
 
-          <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 divide-y divide-slate-800/60 scrollbar-thin scrollbar-thumb-purple-500/10">
+          <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 divide-y divide-neutral-200">
             {artifacts.length === 0 ? (
-              <p className="text-xs text-slate-500 py-4 text-center">No registry artifacts discovered yet.</p>
+              <p className="text-xs text-neutral-400 py-4 text-center font-mono italic">// no registry artifacts discovered</p>
             ) : (
               artifacts.map(art => (
                 <label 
                   key={art.id} 
-                  className="flex items-start gap-3 py-2 cursor-pointer group"
+                  className="flex items-start gap-3 py-2.5 cursor-pointer group select-none"
                 >
                   <input 
                     type="checkbox"
                     checked={selectedExtractions.includes(art.id)}
                     onChange={() => toggleExtraction(art.id)}
-                    className="mt-1 rounded text-purple-600 bg-slate-950 border-slate-800 focus:ring-purple-500 focus:ring-offset-slate-900"
+                    className="mt-1 h-4 w-4 accent-black border-2 border-black rounded-none cursor-pointer"
                   />
-                  <div className="text-left">
-                    <span className="text-xs font-semibold text-slate-300 group-hover:text-purple-400 transition-colors">
+                  <div className="text-left font-mono">
+                    <span className="text-xs font-bold text-black group-hover:text-[#FF5500] transition-colors">
                       {art.name}
                     </span>
-                    <span className="block text-[10px] text-slate-500 font-mono capitalize">
-                      {art.type} &bull; {art.metrics.maturity}
+                    <span className="block text-[10px] text-neutral-400 uppercase font-semibold mt-0.5">
+                      {art.type} // {art.metrics.maturity}
                     </span>
                   </div>
                 </label>
@@ -204,25 +203,21 @@ ${bundleResult.installNotes}
             )}
           </div>
 
-          <div className="border-t border-slate-800 pt-4">
+          <div className="border-t border-black pt-4">
             <button
               onClick={handleRunUnifier}
               disabled={loading || artifacts.length === 0}
-              className={`w-full py-2.5 px-4 rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all ${
-                loading || artifacts.length === 0
-                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
-                  : 'bg-purple-600 text-white hover:bg-purple-700 active:scale-[0.98] border border-purple-500'
-              }`}
+              className="w-full py-3 bg-black text-white hover:bg-neutral-900 border-2 border-black rounded-none text-xs font-mono font-bold uppercase tracking-widest disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all hover:shadow-[3px_3px_0px_0px_#FF5500]"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin text-purple-300" />
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
                   <span>{loadingMessage}</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 text-purple-300" />
-                  <span>Compile Unifier Manifest</span>
+                  <Sparkles className="w-4 h-4 text-white" />
+                  <span>Compile Manifest</span>
                 </>
               )}
             </button>
@@ -230,49 +225,49 @@ ${bundleResult.installNotes}
         </div>
 
         {/* Right Columns: Manifest Outputs */}
-        <div className="lg:col-span-2 flex flex-col min-h-[350px] bg-slate-950/40 border border-slate-800 rounded-xl overflow-hidden">
+        <div className="lg:col-span-2 flex flex-col min-h-[350px] bg-white border-2 border-black rounded-none overflow-hidden">
           {/* Output Header / Tabs */}
-          <div className="bg-slate-900 px-4 py-2 border-b border-slate-800 flex flex-wrap justify-between items-center gap-4">
-            <div className="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800">
+          <div className="bg-neutral-50 px-4 py-2 border-b-2 border-black flex flex-wrap justify-between items-center gap-4">
+            <div className="flex border border-neutral-300 p-0.5 bg-white">
               <button
                 onClick={() => setActiveTab('decisions')}
                 disabled={!manifest}
-                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                  !manifest ? 'text-slate-600 cursor-not-allowed' :
-                  activeTab === 'decisions' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'
+                className={`px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider transition-all ${
+                  !manifest ? 'text-neutral-300 cursor-not-allowed' :
+                  activeTab === 'decisions' ? 'bg-black text-white' : 'text-neutral-500 hover:text-black'
                 }`}
               >
-                Resolution Decisions
+                Decisions
               </button>
               <button
                 onClick={() => setActiveTab('standalone')}
                 disabled={!manifest}
-                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                  !manifest ? 'text-slate-600 cursor-not-allowed' :
-                  activeTab === 'standalone' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'
+                className={`px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider transition-all ${
+                  !manifest ? 'text-neutral-300 cursor-not-allowed' :
+                  activeTab === 'standalone' ? 'bg-black text-white' : 'text-neutral-500 hover:text-black'
                 }`}
               >
-                Standalone Isolated ({manifest?.extractedStandaloneModules?.length || 0})
+                Isolated ({manifest?.extractedStandaloneModules?.length || 0})
               </button>
               <button
                 onClick={() => setActiveTab('warnings')}
                 disabled={!manifest}
-                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                  !manifest ? 'text-slate-600 cursor-not-allowed' :
-                  activeTab === 'warnings' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'
+                className={`px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider transition-all ${
+                  !manifest ? 'text-neutral-300 cursor-not-allowed' :
+                  activeTab === 'warnings' ? 'bg-black text-white' : 'text-neutral-500 hover:text-black'
                 }`}
               >
-                Warnings ({manifest?.warnings?.length || 0})
+                Alerts ({manifest?.warnings?.length || 0})
               </button>
               <button
                 onClick={() => setActiveTab('json')}
                 disabled={!manifest}
-                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                  !manifest ? 'text-slate-600 cursor-not-allowed' :
-                  activeTab === 'json' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'
+                className={`px-3 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider transition-all ${
+                  !manifest ? 'text-neutral-300 cursor-not-allowed' :
+                  activeTab === 'json' ? 'bg-black text-white' : 'text-neutral-500 hover:text-black'
                 }`}
               >
-                Raw Manifest JSON
+                JSON
               </button>
             </div>
 
@@ -280,17 +275,17 @@ ${bundleResult.installNotes}
               <div className="flex gap-2">
                 <button
                   onClick={handleCopyJson}
-                  className="p-1.5 rounded bg-slate-950 border border-slate-800 hover:border-slate-600 text-slate-300 transition-all active:scale-95"
+                  className="p-1.5 border border-black bg-white text-black hover:bg-black hover:text-white transition-all text-xs font-mono"
                   title="Copy Blueprint JSON"
                 >
-                  {isCopied ? <CheckCircle className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                  {isCopied ? 'COPIED' : 'COPY'}
                 </button>
                 <button
                   onClick={handleDownloadJson}
-                  className="p-1.5 rounded bg-slate-950 border border-slate-800 hover:border-slate-600 text-slate-300 transition-all active:scale-95"
+                  className="p-1.5 border border-black bg-white text-black hover:bg-black hover:text-white transition-all"
                   title="Download Manifest"
                 >
-                  <Download className="w-4 h-4 text-purple-400" />
+                  <Download className="w-4 h-4 text-black" />
                 </button>
               </div>
             )}
@@ -300,11 +295,11 @@ ${bundleResult.installNotes}
           <div className="p-6 flex-1 overflow-y-auto max-h-[400px]">
             {!manifest ? (
               <div className="h-full flex flex-col justify-center items-center text-center p-8 space-y-3">
-                <GitMerge className="w-10 h-10 text-slate-600 animate-pulse" />
+                <GitMerge className="w-8 h-8 text-neutral-400 animate-pulse" />
                 <div>
-                  <h5 className="font-bold text-slate-300">Generate Blueprint Manifest</h5>
-                  <p className="text-xs text-slate-500 max-w-sm mt-1 mx-auto leading-relaxed">
-                    Select standalone extractions on the left if desired, and click "Compile Unifier Manifest" to invoke the Principal Architect resolution matrix.
+                  <h5 className="font-mono text-xs font-bold uppercase tracking-wider text-black">Generate Blueprint Manifest</h5>
+                  <p className="text-xs text-neutral-500 max-w-sm mt-1 mx-auto leading-relaxed font-sans">
+                    Configure modular exceptions on the left as required, then invoke the Principal Architect engine pass.
                   </p>
                 </div>
               </div>
@@ -312,11 +307,11 @@ ${bundleResult.installNotes}
               <>
                 {activeTab === 'decisions' && (
                   <div className="space-y-4 text-left">
-                    <div className="bg-purple-500/5 p-3 rounded-lg border border-purple-500/10 text-xs text-purple-300 flex items-start gap-2.5">
-                      <Info className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
+                    <div className="border border-black bg-neutral-50 p-3.5 text-[11px] font-mono text-black flex items-start gap-2.5">
+                      <Info className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />
                       <div>
-                        <strong>Target Unified Architecture Model:</strong>
-                        <span className="block text-slate-300 font-semibold mt-0.5">{manifest.targetArchitecture}</span>
+                        <strong>TARGET ARCHITECTURE COMPLIANCE:</strong>
+                        <span className="block text-[#FF5500] font-bold mt-1 uppercase">{manifest.targetArchitecture}</span>
                       </div>
                     </div>
 
@@ -324,29 +319,29 @@ ${bundleResult.installNotes}
                       {manifest.decisions.map((decision, index) => {
                         const artifact = artifacts.find(a => a.id === decision.winningArtifactId);
                         return (
-                          <div key={index} className="bg-slate-900/60 border border-slate-800 rounded-lg p-4 space-y-3">
-                            <div className="flex flex-wrap justify-between items-center gap-2 border-b border-slate-800 pb-2">
+                          <div key={index} className="border-2 border-black bg-white p-4 space-y-3">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-200 pb-2">
                               <div className="flex items-center gap-2">
-                                <span className="bg-purple-500/10 text-purple-400 border border-purple-500/20 font-mono text-[10px] px-1.5 py-0.5 rounded">
-                                  Concept #{index + 1}
+                                <span className="border border-black bg-black text-white font-mono text-[9px] px-1.5 py-0.5">
+                                  COMP_{index + 1}
                                 </span>
-                                <h5 className="font-bold text-sm text-slate-200">
+                                <h5 className="font-bold text-sm text-black uppercase">
                                   {artifact ? artifact.name : decision.winningArtifactId}
                                 </h5>
                               </div>
-                              <span className="text-[11px] text-slate-400">
-                                Winner Source: <strong className="text-purple-300">{decision.winningRepositoryId}</strong>
+                              <span className="text-[10px] font-mono text-neutral-500 uppercase">
+                                Source: <strong className="text-black font-bold">{decision.winningRepositoryId}</strong>
                               </span>
                             </div>
 
-                            <p className="text-xs text-slate-300 leading-relaxed">
-                              <strong>Resolution Decision:</strong> {decision.reasoning}
+                            <p className="text-xs text-neutral-700 leading-relaxed font-sans">
+                              <strong className="font-mono text-[11px] text-black uppercase block mb-1">Resolution Protocol:</strong> {decision.reasoning}
                             </p>
 
                             {decision.requiredIntegrations.length > 0 && (
-                              <div className="space-y-1">
-                                <span className="text-[10px] uppercase tracking-wider font-semibold text-purple-400 block">Required Bridge Adaptations</span>
-                                <ul className="list-disc pl-4 text-xs text-slate-400 space-y-0.5">
+                              <div className="space-y-1 font-mono text-[11px]">
+                                <span className="text-[10px] uppercase tracking-wider font-bold text-[#FF5500] block">Required Adapter Contracts:</span>
+                                <ul className="list-disc pl-4 text-neutral-600 space-y-0.5">
                                   {decision.requiredIntegrations.map((integration, idx) => (
                                     <li key={idx}>{integration}</li>
                                   ))}
@@ -355,8 +350,8 @@ ${bundleResult.installNotes}
                             )}
 
                             {decision.discardedArtifactIds.length > 0 && (
-                              <p className="text-[10px] text-slate-500 font-medium bg-slate-950 p-2 rounded border border-slate-900/60">
-                                <strong>Superseded Candidates:</strong> {decision.discardedArtifactIds.join(', ')} (marked for safe removal/deprecating)
+                              <p className="text-[10px] font-mono text-neutral-500 bg-neutral-50 p-2.5 border border-dashed border-neutral-300">
+                                <strong>Decommissioned Candidates:</strong> {decision.discardedArtifactIds.join(', ')}
                               </p>
                             )}
                           </div>
@@ -369,34 +364,34 @@ ${bundleResult.installNotes}
                 {activeTab === 'standalone' && (
                   <div className="space-y-3 text-left">
                     {manifest.extractedStandaloneModules.length === 0 ? (
-                      <div className="text-center py-10 text-slate-500 text-xs">
-                        No standalone packages were isolated. All components are cataloged for inline unification.
+                      <div className="text-center py-10 font-mono text-neutral-400 text-xs">
+                        // No isolated modules. All services unified inline.
                       </div>
                     ) : (
                       manifest.extractedStandaloneModules.map((mod, idx) => (
-                        <div key={idx} className="bg-slate-900 p-4 rounded-lg border border-slate-800 flex items-center justify-between gap-3">
+                        <div key={idx} className="bg-white border-2 border-black p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                           <div className="flex items-start gap-3">
-                            <CheckCircle className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
-                            <div>
-                              <span className="text-xs font-bold text-slate-200">{mod.artifactId}</span>
-                              <p className="text-xs text-slate-400 mt-1 italic">"{mod.reason}"</p>
+                            <CheckCircle className="w-4 h-4 text-black mt-0.5 flex-shrink-0" />
+                            <div className="font-mono">
+                              <span className="text-xs font-bold text-black">{mod.artifactId}</span>
+                              <p className="text-[11px] text-neutral-500 mt-1 italic">"{mod.reason}"</p>
                             </div>
                           </div>
                           <button
                             onClick={() => handleExportBundle(mod)}
                             disabled={extractingBundleId !== null}
-                            className="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600 border border-purple-500/20 hover:border-purple-500 text-purple-300 hover:text-white rounded-lg text-[11px] font-bold transition-all flex items-center gap-1.5 disabled:opacity-40 flex-shrink-0"
+                            className="px-4 py-2 bg-black hover:bg-neutral-900 text-white border-2 border-black rounded-none font-mono text-xs uppercase tracking-wider font-bold transition-all disabled:opacity-40 flex-shrink-0"
                           >
                             {extractingBundleId === mod.artifactId ? (
-                              <>
+                              <div className="flex items-center gap-1.5">
                                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
                                 <span>Exporting...</span>
-                              </>
+                              </div>
                             ) : (
-                              <>
+                              <div className="flex items-center gap-1.5">
                                 <Download className="w-3.5 h-3.5" />
-                                <span>Export Package</span>
-                              </>
+                                <span>Export</span>
+                              </div>
                             )}
                           </button>
                         </div>
@@ -408,17 +403,17 @@ ${bundleResult.installNotes}
                 {activeTab === 'warnings' && (
                   <div className="space-y-3 text-left">
                     {manifest.warnings.length === 0 ? (
-                      <div className="bg-emerald-500/10 p-4 rounded-lg border border-emerald-500/20 text-xs text-emerald-400 flex items-center gap-2">
-                        <CheckCircle className="w-5 h-5 text-emerald-500" />
-                        <span>High Ecosystem Fit! No tech-stack discrepancies or conflicting frameworks were flagged.</span>
+                      <div className="border border-black bg-[#FAF9F5] p-4 text-xs font-mono text-black flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-black" />
+                        <span>High Ecosystem Fit! No tech-stack discrepancies detected.</span>
                       </div>
                     ) : (
                       manifest.warnings.map((warning, idx) => (
-                        <div key={idx} className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3.5 flex items-start gap-3">
-                          <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <span className="text-xs font-bold text-amber-400">Conflict Warning</span>
-                            <p className="text-xs text-slate-300 mt-1 leading-relaxed">{warning}</p>
+                        <div key={idx} className="border-2 border-red-600 bg-red-50 p-4 flex items-start gap-3 rounded-none">
+                          <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+                          <div className="font-mono">
+                            <span className="text-[11px] font-bold text-red-700 uppercase">Architecture Clashing Alert</span>
+                            <p className="text-xs text-red-950 mt-1 leading-relaxed font-sans">{warning}</p>
                           </div>
                         </div>
                       ))
@@ -427,7 +422,7 @@ ${bundleResult.installNotes}
                 )}
 
                 {activeTab === 'json' && (
-                  <div className="relative text-left font-mono text-xs text-slate-300 bg-slate-900 rounded-lg p-4 border border-slate-800 overflow-x-auto select-all max-h-[350px]">
+                  <div className="relative text-left font-mono text-xs text-black bg-neutral-50 border border-black p-4 select-all max-h-[350px] overflow-x-auto">
                     <pre className="whitespace-pre-wrap">{JSON.stringify(manifest, null, 2)}</pre>
                   </div>
                 )}

@@ -1,54 +1,137 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
   
-  --color-soft-bg: #F0F2F5;
-  --color-soft-shadow-dark: #D1D9E6;
-  --color-soft-shadow-light: #FFFFFF;
-  
-  --color-premium-slate: #1A1C1E;
-  --color-premium-acc: #3B82F6;
-  --color-premium-border: #E2E8F0;
+  --color-soft-bg: #FAF9F5;
+  --color-premium-slate: #0C0D0E;
+  --color-premium-acc: #FF5500; /* Safety Orange */
+  --color-premium-border: #0C0D0E;
 }
 
 @layer utilities {
+  .sci-grid {
+    background-size: 24px 24px;
+    background-image: 
+      linear-gradient(to right, rgba(12, 13, 14, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(12, 13, 14, 0.03) 1px, transparent 1px);
+  }
+
+  .sci-dots {
+    background-size: 16px 16px;
+    background-image: radial-gradient(rgba(12, 13, 14, 0.08) 1px, transparent 1px);
+  }
+
+  /* Tactile minimalist shadow elevations */
+  .sci-card {
+    background: #FFFFFF;
+    border: 1.5px solid #0C0D0E;
+    box-shadow: 2px 2px 0px 0px #0C0D0E;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .sci-card:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0px 0px #0C0D0E;
+  }
+
+  .sci-input {
+    background: #FFFFFF;
+    border: 1.5px solid #0C0D0E;
+    outline: none;
+    transition: all 0.15s ease;
+  }
+
+  .sci-input:focus {
+    box-shadow: 2px 2px 0px 0px #0C0D0E;
+    border-color: #0C0D0E;
+  }
+
+  .sci-btn {
+    background: #0C0D0E;
+    color: #FAF9F5;
+    border: 1.5px solid #0C0D0E;
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    font-weight: 600;
+  }
+
+  .sci-btn:hover {
+    background: #FAF9F5;
+    color: #0C0D0E;
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px 0px #0C0D0E;
+  }
+
+  .sci-btn:active {
+    transform: translate(0px, 0px);
+    box-shadow: 0px 0px 0px 0px #0C0D0E;
+  }
+
+  .sci-btn-secondary {
+    background: #FAF9F5;
+    color: #0C0D0E;
+    border: 1.5px solid #0C0D0E;
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    font-weight: 600;
+  }
+
+  .sci-btn-secondary:hover {
+    background: #0C0D0E;
+    color: #FAF9F5;
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px 0px #0C0D0E;
+  }
+
+  /* Retro neumorphism mapping backward compatibility */
   .soft-out {
-    background: #F0F2F5;
-    box-shadow: 9px 9px 16px #D1D9E6, -9px -9px 16px #FFFFFF;
+    background: #FFFFFF;
+    border: 1.5px solid #0C0D0E;
+    box-shadow: 2px 2px 0px 0px #0C0D0E;
   }
   
   .soft-in {
-    background: #F0F2F5;
-    box-shadow: inset 6px 6px 12px #D1D9E6, inset -6px -6px 12px #FFFFFF;
+    background: #FDFDFB;
+    border: 1px dashed #0C0D0E;
   }
 
   .soft-button {
-    background: #F0F2F5;
-    box-shadow: 4px 4px 8px #D1D9E6, -4px -4px 8px #FFFFFF;
-    transition: all 0.2s ease;
+    background: #FFFFFF;
+    border: 1.5px solid #0C0D0E;
+    transition: all 0.15s ease;
   }
 
-  .soft-button:active {
-    box-shadow: inset 4px 4px 8px #D1D9E6, inset -4px -4px 8px #FFFFFF;
-    transform: scale(0.98);
+  .soft-button:hover {
+    background: #0C0D0E;
+    color: #FAF9F5;
   }
 
   .glass-card {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: #FFFFFF;
+    border: 1.5px solid #0C0D0E;
   }
 }
 
 body {
-  background-color: #F0F2F5;
-  color: #1A1C1E;
+  background-color: #FAF9F5;
+  color: #0C0D0E;
   font-family: var(--font-sans);
 }
 
 h1, h2, h3, .font-display {
   font-family: var(--font-display);
 }
+
+/* Subtle science radar animations */
+@keyframes grid-pulse {
+  0% { opacity: 0.15; }
+  50% { opacity: 0.4; }
+  100% { opacity: 0.15; }
+}
+
+.animate-grid-pulse {
+  animation: grid-pulse 6s infinite ease-in-out;
+}
+

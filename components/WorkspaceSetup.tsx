@@ -18,36 +18,49 @@ const WorkspaceSetup: React.FC<WorkspaceSetupProps> = ({ onCreateWorkspace }) =>
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-12">
-      <div className="soft-out rounded-[40px] p-12 bg-white/60 relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-8 opacity-10">
-           <Plus className="w-32 h-32" />
+    <div className="max-w-xl mx-auto py-12 px-4 sm:px-0">
+      <div className="bg-white border-2 border-black rounded-none p-8 md:p-12 relative overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <div className="absolute top-4 right-4 font-mono text-[9px] text-neutral-400 font-bold uppercase tracking-widest select-none">
+          SYS.INIT // CORE_v2.0
         </div>
-        <h2 className="text-4xl font-black font-display tracking-tighter text-slate-900 mb-4">Initialize Analysis</h2>
-        <p className="text-slate-500 mb-10 leading-relaxed text-lg">
-          Connect your application variants to start the consolidation engine. We'll decompose, compare, and harmonize your specs.
+        
+        <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tighter text-black mb-4 uppercase">
+          Initialize Studio
+        </h2>
+        
+        <p className="text-neutral-600 mb-8 leading-relaxed text-sm font-sans">
+          Aggregate, analyze, and unify contrasting application specifications or raw codebases into a single, high-integrity master architecture blueprint.
         </p>
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="workspaceName" className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-3 ml-1">Portfolio Strategy Name</label>
+            <label htmlFor="workspaceName" className="block text-[11px] font-mono uppercase tracking-widest text-black font-semibold mb-2">
+              Portfolio Strategy Name
+            </label>
             <input
               id="workspaceName"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Enterprise Core Migration"
-              className="w-full px-6 py-4 soft-in border-none rounded-2xl focus:ring-4 focus:ring-blue-500/10 outline-none text-slate-800 placeholder:text-slate-300 font-medium transition-all"
+              className="w-full px-4 py-3.5 bg-white border-2 border-black rounded-none text-black placeholder:text-neutral-400 font-medium transition-all focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] outline-none"
               required
             />
           </div>
+          
           <button
             type="submit"
-            className="w-full px-8 py-5 bg-slate-900 hover:bg-black text-white rounded-2xl font-bold tracking-tight flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] shadow-2xl shadow-slate-900/20"
+            className="w-full px-6 py-4 bg-black text-white hover:bg-neutral-900 border-2 border-black rounded-none font-bold tracking-tight flex items-center justify-center gap-3 transition-all hover:shadow-[3px_3px_0px_0px_#FF5500]"
           >
-            <Plus className="w-6 h-6" />
-            <span>Launch Workspace</span>
+            <Plus className="w-5 h-5 text-white" />
+            <span className="uppercase text-xs font-mono tracking-widest">Launch Workspace</span>
           </button>
         </form>
+
+        <div className="mt-8 pt-6 border-t border-dashed border-neutral-200 flex justify-between items-center text-[10px] font-mono text-neutral-400">
+          <span>PORTFOLIO SYSTEM ONLINE</span>
+          <span>● READY</span>
+        </div>
       </div>
     </div>
   );
