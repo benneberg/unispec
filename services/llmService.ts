@@ -1,6 +1,6 @@
 import { type ApiConfig, type Variant, type ComparisonData, type ExtractedSpecs, type ConsolidatedDocs, type LowLevelExtraction, type MidLevelSynthesis, type HighLevelIntent, type NormalizationResult, type ValidationReport, type Workspace } from '../types';
 
-async function performApiCall(prompt: string, apiConfig: ApiConfig, expectJson: boolean = true): Promise<any> {
+export async function performApiCall(prompt: string, apiConfig: ApiConfig, expectJson: boolean = true): Promise<any> {
   const { provider, apiKey, model } = apiConfig;
 
   const body: { [key: string]: any } = {
@@ -174,23 +174,32 @@ export const runFinalSpecBuild = async (pipelineResults: ExtractedSpecs['pipelin
 
 export const compareVariants = async (variants: Variant[], apiConfig: ApiConfig): Promise<ComparisonData> => {
     const prompt = `
-    Perform a meta-comparison of the following application variants based on their hierarchical analysis. 
-    Focus on design philosophy, architectural approach, and key trade-offs.
+    Perform a semantic comparison of the following application variants based on their extracted Knowledge Artifacts.
+    Identify:
+    - Shared artifacts across variants.
+    - Differences in implementations and designs for similar artifacts.
+    - Architectural improvements and recommendations.
+    
     Respond with a valid JSON object with keys: "featureMatrix", "architectureDiff", "dataModelDiff", "recommendations", "tradeoffs".
 
-    - featureMatrix: (string) A markdown table comparing key functional groups across variants.
-    - architectureDiff: (string) A summary comparing the architectural approaches, patterns, and design philosophies.
-    - dataModelDiff: (string) A comparison of the data design intentions and data models.
-    - recommendations: (string) Actionable suggestions for merging the variants, considering their high-level intent.
-    - tradeoffs: (string) A list of key trade-offs and decisions to be made for the final consolidated app.
+    - featureMatrix: (string) A markdown table comparing key Knowledge Artifacts and capabilities across variants.
+    - architectureDiff: (string) A detailed summary comparing the architectural approaches, patterns, decisions, and system boundaries mapped out by the artifacts.
+    - dataModelDiff: (string) A comparison of the entities, data layouts, and data design intentions discovered.
+    - recommendations: (string) Actionable recommendations on which artifacts to merge (e.g. "Merge auth, keep React UI"), which to evolve, and which to deprecate or discard.
+    - tradeoffs: (string) A list of key tradeoffs and architectural decisions required for the consolidated master model.
 
-    Variants Analysis:
+    Discovered Knowledge Artifacts for each Variant:
     ${variants.map(v => `
-    ## ${v.name}:
-    ### High-Level Intent: 
-    ${JSON.stringify(v.extractedSpecs?.pipelineResults?.highLevel).substring(0, 1000)}
-    ### Functional Groups: 
-    ${JSON.stringify(v.extractedSpecs?.pipelineResults?.midLevel?.functionalGroups).substring(0, 1000)}
+    ## Variant Name: ${v.name}
+    Artifacts Discovered:
+    ${JSON.stringify((v.knowledgeArtifacts || []).map(a => ({
+      id: a.id,
+      type: a.type,
+      name: a.name,
+      purpose: a.purpose,
+      maturity: a.metrics.maturity,
+      reusePotential: a.metrics.reusePotential
+    })), null, 2)}
     `).join('\n')}
     `;
     return performApiCall(prompt, apiConfig);
@@ -227,24 +236,35 @@ export const detectAndNormalize = async (variants: Variant[], comparison: Compar
 export const consolidateSpecifications = async (variants: Variant[], comparison: ComparisonData, normalization: NormalizationResult, apiConfig: ApiConfig): Promise<ConsolidatedDocs> => {
     const prompt = `
     Create a consolidated master specification from the provided application variants, comparison analysis, and the crucial normalization report.
-    The normalization report contains the definitive, harmonized models that MUST be used as the foundation for the new documentation.
+    The master specification must be generated from the Semantic Model (the combined Knowledge Artifacts of all variants).
     Generate complete documentation for each of the following sections.
     Respond with a valid JSON object with the following keys, where each key contains the content in markdown format: "prd", "architecture", "modules", "dataModel", "decisions", "migration".
     
-    - prd: A full Product Requirements Document (PRD).
-    - architecture: A detailed System Architecture document based on the harmonized model.
-    - modules: A breakdown of the system into modules, reflecting the normalized structure.
+    - prd: A full Product Requirements Document (PRD) driven by the discovered capabilities and products.
+    - architecture: A detailed System Architecture document based on the harmonized model, patterns, and component registry.
+    - modules: A breakdown of the system into modular packages, reflecting the promoted component and service artifacts.
     - dataModel: A specification for the unified data model, based on the harmonized model.
-    - decisions: A log of key architectural and design decisions made, informed by the conflict resolutions.
+    - decisions: A log of key architectural and design decisions made, mapping to documented decision artifacts.
     - migration: A high-level implementation and migration roadmap.
 
-    ## Variants Summary:
-    ${variants.map(v => `${v.name}: ${JSON.stringify(v.extractedSpecs).substring(0, 1000)}`).join('\n')}
+    ## Semantic Model (Knowledge Artifacts from all Variants):
+    ${variants.map(v => `
+    ### Variant: ${v.name}
+    Artifacts:
+    ${JSON.stringify((v.knowledgeArtifacts || []).map(a => ({
+      id: a.id,
+      type: a.type,
+      name: a.name,
+      purpose: a.purpose,
+      maturity: a.metrics.maturity,
+      reusePotential: a.metrics.reusePotential
+    })), null, 2)}
+    `).join('\n')}
 
     ## Comparison Analysis:
     ${JSON.stringify(comparison).substring(0, 1500)}
     
-    ## CRITICAL: Normalization and Harmonization Report (This is the source of truth for the new design):
+    ## CRITICAL: Normalization and Harmonization Report:
     ${JSON.stringify(normalization).substring(0, 2500)}
     `;
     return performApiCall(prompt, apiConfig);
@@ -256,6 +276,7 @@ export const generateVisualsAndBlueprint = async (docs: ConsolidatedDocs, apiCon
   Respond with a single, valid JSON object with two top-level keys: "architectureDiagrams" and "implementationBlueprint".
 
   1. **architectureDiagrams**: An object containing Mermaid.js syntax for the following diagrams. If a diagram is not applicable, omit the key.
+      - "knowledgeHierarchical": (string) A visual top-down hierarchical Knowledge Artifact Map (Mermaid graph TD) showing the mapping from Products -> Capabilities -> Components/Services -> Concrete Implementations.
       - "c4": (string) A C4 Container diagram showing the main components and their interactions.
       - "sequence": (string) A sequence diagram for a primary user flow described in the PRD.
       - "schema": (string) An Entity-Relationship Diagram (ERD) representing the harmonized data model.

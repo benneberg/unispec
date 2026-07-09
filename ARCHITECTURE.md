@@ -14,12 +14,15 @@ UniSpec is built as a **Full-Stack Application** utilizing a React frontend styl
 ## DATA FLOW
 1. **Input**: User adds a `Variant` (Name + Raw Source) via file upload, manual payload, or secure GitHub cloning.
 2. **GitHub Ingress**: The backend `/api/github/clone` recursively fetches the tree, handles rate limits gracefully (utilizing optional `GITHUB_TOKEN` credentials on the server), applies file classifications, and streams content back to the client.
-3. **Extraction Stage**: Automated extraction passes for each variant:
-    - Low-level (Features/UI) -> Mid-level (Logic/Flow) -> High-level (Architecture/Intent).
-4. **Comparison Stage**: Aggregates extracted specs into a "Comparison Prompt" to identify deltas.
-5. **Resolution Stage**: A "Normalizer" pass handles conflict resolution.
-6. **Synthesis Stage**: Generates the final "Master Specification".
-7. **Storage**: Current Portfolios are synchronized with `localStorage`.
+3. **Extraction & Semantic Classification Stage (UniSpec v2 Pipeline)**:
+    - **Pass 1 (Low-level)**: Features, components, and UI layout extraction.
+    - **Pass 2 (Mid-level)**: Local states, business logic, and page navigation flows.
+    - **Pass 3 (High-level)**: Architecture design patterns, data models, and strategic intent.
+    - **Pass 4 (Semantic Classification)**: Promotes code blocks to discrete **Knowledge Artifacts** with assigned quality metrics (confidence, reuse potential, maturity level) validated using rigorous **Zod Schemas** in `/knowledge/schema.ts` to block raw registry corruption.
+4. **Comparison & Consolidation Stage**: Aggregates extracted artifacts into the master `consolidateRegistry` engine, merging identical/overlapping components across variants, incrementing source counts, mapping dependencies, and generating a **Maturity Evolution Report** tracking the maturity drift.
+5. **Resolution Stage**: A "Normalizer" pass handles conflict resolution and specs harmonization.
+6. **Synthesis Stage**: Generates the final "Master Specification" dynamically synthesized from the structured Knowledge Artifact Registry.
+7. **Storage**: Current Portfolios, consolidated specifications, knowledge registries, and evolution timelines are synchronized and persisted in `localStorage`.
 
 ## EXTERNAL INTEGRATIONS
 - **GitHub Proxy Service**: Recursive file tree discovery and server-side parallel fetching with a 300-file threshold.

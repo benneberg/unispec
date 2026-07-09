@@ -91,12 +91,13 @@ const Diagram: React.FC<{ title: string; mermaidCode: string }> = ({ title, merm
 const ArchitectureDiagrams: React.FC<{ diagrams: ArchitectureDiagrams }> = ({ diagrams }) => {
   return (
     <div className="bg-slate-800/50 rounded-xl p-6 border border-purple-500/20 space-y-6">
-      <h3 className="text-xl font-bold">Architecture Diagrams</h3>
+      <h3 className="text-xl font-bold">Architecture Diagrams & Knowledge Maps</h3>
       <div className="space-y-6">
-        {diagrams.c4 && <Diagram title="C4 Container" mermaidCode={diagrams.c4} />}
-        {diagrams.sequence && <Diagram title="Sequence Diagram" mermaidCode={diagrams.sequence} />}
+        {diagrams.knowledgeHierarchical && <Diagram title="Knowledge Artifact Map (Product -> Capability -> Component -> Impl)" mermaidCode={diagrams.knowledgeHierarchical} />}
+        {diagrams.c4 && <Diagram title="C4 Container Diagram" mermaidCode={diagrams.c4} />}
+        {diagrams.sequence && <Diagram title="Sequence Flow" mermaidCode={diagrams.sequence} />}
         {diagrams.schema && <Diagram title="Database Schema (ERD)" mermaidCode={diagrams.schema} />}
-        {!diagrams.c4 && !diagrams.sequence && !diagrams.schema && (
+        {!diagrams.knowledgeHierarchical && !diagrams.c4 && !diagrams.sequence && !diagrams.schema && (
             <p className="text-slate-400">No diagrams were generated.</p>
         )}
       </div>

@@ -1,4 +1,6 @@
 
+import { type KnowledgeArtifact, type EvolutionReport } from './knowledge/types';
+
 export interface LowLevelExtraction {
   rawFeatures: string;
   modules: string;
@@ -49,6 +51,7 @@ export interface Variant {
   owner?: string;
   repo?: string;
   extractedSpecs: ExtractedSpecs | null;
+  knowledgeArtifacts?: KnowledgeArtifact[];
   extractionProgress: number; // 0: not started, 1: stage 1 done, etc.
   totalExtractionSteps: number; // 4 for file/manual, 5 for repo
 }
@@ -57,7 +60,10 @@ export interface Workspace {
   id: string;
   name: string;
   variants: Variant[];
+  knowledgeArtifacts?: KnowledgeArtifact[];
+  evolutionReports?: EvolutionReport[];
   createdAt: string;
+  consolidatedSpecs?: ConsolidatedDocs | null;
 }
 
 export interface ApiConfig {
@@ -79,6 +85,7 @@ export interface ArchitectureDiagrams {
   c4?: string;
   sequence?: string;
   schema?: string;
+  knowledgeHierarchical?: string;
 }
 
 export interface ImplementationBlueprint {

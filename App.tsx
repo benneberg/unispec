@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { WorkspaceProvider, useWorkspace } from './contexts/WorkspaceContext';
 import { type Variant, type ApiConfig, type QAMessage } from './types';
 import * as llmService from './services/llmService';
+import { classifyArtifacts, generateSpecFromArtifacts, consolidateRegistry } from './knowledge/classifier';
 import { GitBranch, Zap, Info } from './components/Icons';
 import WorkspaceSetup from './components/WorkspaceSetup';
 import AddVariants from './components/AddVariants';
@@ -136,7 +137,7 @@ const AppContent: React.FC = () => {
     let currentVariant = { ...variant };
     
     const isRepo = variant.totalExtractionSteps === 5;
-    const stages = isRepo ? ['summarize', 'low-level', 'mid-level', 'high-level', 'final'] : ['low-level', 'mid-level', 'high-level', 'final'];
+    const stages = isRepo ? ['summarize', 'low-level', 'mid-level', 'high-level', 'semantic-classification'] : ['low-level', 'mid-level', 'high-level', 'semantic-classification'];
     let analysisInput = variant.rawContent;
 
     try {
@@ -171,11 +172,15 @@ const AppContent: React.FC = () => {
                     const highLevel = await llmService.runHighLevelIntent(updatedSpecs.pipelineResults.midLevel, currentVariant, apiConfig);
                     updatedSpecs.pipelineResults.highLevel = highLevel;
                     break;
-                case 'final':
+                case 'semantic-classification':
                     if (!updatedSpecs.pipelineResults) {
-                         throw new Error(`Final build requires previous extraction results for ${currentVariant.name}`);
+                         throw new Error(`Semantic classification requires previous extraction results for ${currentVariant.name}`);
                     }
-                    const finalSpecs = await llmService.runFinalSpecBuild(updatedSpecs.pipelineResults, currentVariant, apiConfig);
+                    const extractedContext = JSON.stringify(updatedSpecs.pipelineResults);
+                    const artifacts = await classifyArtifacts(extractedContext, currentVariant.id, apiConfig);
+                    currentVariant.knowledgeArtifacts = artifacts;
+                    
+                    const finalSpecs = generateSpecFromArtifacts(artifacts);
                     updatedSpecs = { ...updatedSpecs, ...finalSpecs };
                     break;
             }
@@ -201,13 +206,23 @@ const AppContent: React.FC = () => {
     setLoading(true);
     
     try {
-      setLoading(true, 'Comparing variants...');
+      setLoading(true, 'Comparing variant Knowledge Artifacts...');
       const comparison = await llmService.compareVariants(currentWorkspace.variants, apiConfig);
       dispatch({ type: 'SET_COMPARISON_DATA', payload: comparison });
 
-      setLoading(true, 'Detecting conflicts & normalizing specs...');
+      setLoading(true, 'Detecting conflicts & normalizing specifications...');
       const normalization = await llmService.detectAndNormalize(currentWorkspace.variants, comparison, apiConfig);
       dispatch({ type: 'SET_NORMALIZATION_RESULT', payload: normalization });
+
+      setLoading(true, 'Building global Knowledge Artifact Registry & Evolution Reports...');
+      const registry = await consolidateRegistry(currentWorkspace.variants, apiConfig);
+      
+      const updatedWorkspace = {
+        ...currentWorkspace,
+        knowledgeArtifacts: registry.artifacts,
+        evolutionReports: registry.evolutionReports
+      };
+      dispatch({ type: 'UPDATE_WORKSPACE', payload: updatedWorkspace });
 
       dispatch({ type: 'SET_ACTIVE_STEP', payload: 4 });
     } catch (err) {
@@ -341,6 +356,7 @@ const AppContent: React.FC = () => {
             'Data-Model.md': consolidatedDocs.dataModel || '',
             'Design-Decisions.md': consolidatedDocs.decisions || '',
             'Migration-Plan.md': consolidatedDocs.migration || '',
+            'Knowledge-Artifact-Map.md': consolidatedDocs.architectureDiagrams?.knowledgeHierarchical ? '```mermaid\n' + consolidatedDocs.architectureDiagrams.knowledgeHierarchical + '\n```' : '',
             'C4-Diagram.md': consolidatedDocs.architectureDiagrams?.c4 ? '```mermaid\n' + consolidatedDocs.architectureDiagrams.c4 + '\n```' : '',
             'Sequence-Diagram.md': consolidatedDocs.architectureDiagrams?.sequence ? '```mermaid\n' + consolidatedDocs.architectureDiagrams.sequence + '\n```' : '',
             'Schema-Diagram.md': consolidatedDocs.architectureDiagrams?.schema ? '```mermaid\n' + consolidatedDocs.architectureDiagrams.schema + '\n```' : '',
@@ -350,7 +366,7 @@ const AppContent: React.FC = () => {
             'Blueprint-APIs.ts': consolidatedDocs.implementationBlueprint?.apiSkeletons || '',
             'Validation-Report.md': consolidatedDocs.validationReport ? 
                 `# Validation Report\n\n**Summary:** ${consolidatedDocs.validationReport.summary}\n\n` +
-                consolidatedDocs.validationReport.findings.map(f => `## ${f.type.toUpperCase()}: ${f.area} (from ${f.variant})\n- ${f.finding}`).join('\n\n')
+                 consolidatedDocs.validationReport.findings.map(f => `## ${f.type.toUpperCase()}: ${f.area} (from ${f.variant})\n- ${f.finding}`).join('\n\n')
                 : '',
         };
         Object.entries(files).forEach(([filename, content]) => downloadFile(content, filename));
@@ -362,7 +378,8 @@ const AppContent: React.FC = () => {
         downloadFile(content, 'PRD.md');
     } else if (template === 'tdd') {
         let content = `# Technical Design Document: ${currentWorkspace?.name || 'Consolidated App'}\n\n`;
-        content += '## 1. System Architecture\n\n' + (consolidatedDocs.architecture || 'Not specified.');
+        content += '## 1. System Architecture & Knowledge Map\n\n' + (consolidatedDocs.architecture || 'Not specified.');
+        if (consolidatedDocs.architectureDiagrams?.knowledgeHierarchical) content += '\n\n### Hierarchical Knowledge Artifact Map\n\n```mermaid\n' + consolidatedDocs.architectureDiagrams.knowledgeHierarchical + '\n```';
         if (consolidatedDocs.architectureDiagrams?.c4) content += '\n\n### C4 Container Diagram\n\n```mermaid\n' + consolidatedDocs.architectureDiagrams.c4 + '\n```';
         if (consolidatedDocs.architectureDiagrams?.sequence) content += '\n\n### Primary Sequence Diagram\n\n```mermaid\n' + consolidatedDocs.architectureDiagrams.sequence + '\n```';
         content += '\n\n## 2. Modules & Subsystems\n\n' + (consolidatedDocs.modules || 'Not specified.');

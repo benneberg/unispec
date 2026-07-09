@@ -6,6 +6,8 @@ import { type ConsolidatedDocs } from '../types';
 import ArchitectureDiagrams from './ArchitectureDiagrams';
 import ImplementationBlueprint from './ImplementationBlueprint';
 import ValidationReportDisplay from './ValidationReportDisplay';
+import KnowledgeRegistryDisplay from './KnowledgeRegistryDisplay';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 
 interface ConsolidatedDocsDisplayProps {
   docs: ConsolidatedDocs;
@@ -17,6 +19,11 @@ interface ConsolidatedDocsDisplayProps {
 }
 
 const ConsolidatedDocsDisplay: React.FC<ConsolidatedDocsDisplayProps> = ({ docs, onShowExportModal, onGenerateVisuals, onRunValidation, onAskArchitect, loading }) => {
+  const { state } = useWorkspace();
+  const { currentWorkspace } = state;
+  const artifacts = currentWorkspace?.knowledgeArtifacts || [];
+  const evolutionReports = currentWorkspace?.evolutionReports || [];
+
   const hasVisuals = !!docs.architectureDiagrams || !!docs.implementationBlueprint;
   const hasValidation = !!docs.validationReport;
   
@@ -68,6 +75,10 @@ const ConsolidatedDocsDisplay: React.FC<ConsolidatedDocsDisplayProps> = ({ docs,
                 })}
             </div>
         </div>
+
+        {artifacts.length > 0 && (
+          <KnowledgeRegistryDisplay artifacts={artifacts} evolutionReports={evolutionReports} />
+        )}
 
         {hasVisuals ? (
           <div className="space-y-6">
