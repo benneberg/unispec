@@ -33,3 +33,16 @@
   **Status**: Completed. Integrated rendering and bulk ZIP export layouts in `App.tsx` and `/components/ArchitectureDiagrams.tsx`.
 - [x] **[Interactive Registry Explorer UI]** Design a high-fidelity visual slate dashboard displaying promoted artifacts, metrics, and maturity shifts.
   **Status**: Completed. Created `/components/KnowledgeRegistryDisplay.tsx` featuring multi-tab views and metrics widgets.
+
+# Phase 6 — Optional UniSpec Unifier Tool Plugin
+- [x] **[Core Architecture]** Decouple Unifier hands (unification, refactoring, manifest compilation) from UniSpec Core brain.
+  **Status**: Completed. Created isolated tool structure in `/tools/unifier/` keeping Core fast and independent.
+- [x] **[Artifact Clustering Heuristics]** Implement smart concept clustering grouping highly overlapping implementations.
+  **Status**: Completed. Built rule-based semantic-aligned grouping mechanics mapping matching types and labels.
+- [x] **[Architectural Grading & Resolving Matrix]** Employ Principal Architect rubric grading candidates on maturity, reuse potential, completeness, and modernization.
+  **Status**: Completed. Programmed structured LLM-resolver validating outputs against strict Zod schemas.
+- [x] **[Warning & Mixed Tech Pass]** Build a post-resolution engine scanning winners for incompatible stacks, mixed languages, or conflicting DB engines.
+  **Status**: Completed. Integrated full-ecosystem compatibility checks.
+- [x] **[Unifier Interface & Manifest Exporter]** Design interactive high-fidelity slate config dashboard displaying conceptual decisions, standalone isolated modules, and exportable manifest JSON blueprints.
+  **Status**: Completed. Created `/components/UnifierToolDisplay.tsx` and wired up full-state saving in active Workspace portfolio records.
+

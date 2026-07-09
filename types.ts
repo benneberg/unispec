@@ -1,5 +1,6 @@
 
 import { type KnowledgeArtifact, type EvolutionReport } from './knowledge/types';
+import { type UnificationManifest } from './tools/unifier/types';
 
 export interface LowLevelExtraction {
   rawFeatures: string;
@@ -64,6 +65,7 @@ export interface Workspace {
   evolutionReports?: EvolutionReport[];
   createdAt: string;
   consolidatedSpecs?: ConsolidatedDocs | null;
+  unificationManifest?: UnificationManifest | null;
 }
 
 export interface ApiConfig {

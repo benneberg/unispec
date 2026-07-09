@@ -4,6 +4,7 @@ import { WorkspaceProvider, useWorkspace } from './contexts/WorkspaceContext';
 import { type Variant, type ApiConfig, type QAMessage } from './types';
 import * as llmService from './services/llmService';
 import { classifyArtifacts, generateSpecFromArtifacts, consolidateRegistry } from './knowledge/classifier';
+import { generateUnificationManifest } from './tools/unifier';
 import { GitBranch, Zap, Info } from './components/Icons';
 import WorkspaceSetup from './components/WorkspaceSetup';
 import AddVariants from './components/AddVariants';
@@ -277,6 +278,30 @@ const AppContent: React.FC = () => {
       dispatch({ type: 'SET_ACTIVE_STEP', payload: 7 });
     } catch (err) {
       throw new Error(`Validation failed: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const runUnifier = async (explicitExtractions: string[]) => {
+    if (!currentWorkspace || !currentWorkspace.knowledgeArtifacts) return;
+    setLoading(true, 'Running Unifier Tool (grading & resolving overlaps)...');
+    try {
+      const manifest = await generateUnificationManifest(
+        currentWorkspace.knowledgeArtifacts,
+        currentWorkspace.name,
+        apiConfig,
+        explicitExtractions
+      );
+      
+      const updatedWorkspace = {
+        ...currentWorkspace,
+        unificationManifest: manifest
+      };
+      
+      dispatch({ type: 'UPDATE_WORKSPACE', payload: updatedWorkspace });
+    } catch (err) {
+      setError(`Unifier compilation failed: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setLoading(false);
     }
@@ -572,6 +597,7 @@ const AppContent: React.FC = () => {
                 onShowExportModal={() => setShowExportModal(true)}
                 onGenerateVisuals={generateDiagramsAndBlueprint}
                 onRunValidation={runValidation}
+                onRunUnifier={runUnifier}
                 onAskArchitect={() => {
                     setQAMessages([]);
                     setShowQAModal(true);

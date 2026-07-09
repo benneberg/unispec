@@ -7,6 +7,7 @@ import ArchitectureDiagrams from './ArchitectureDiagrams';
 import ImplementationBlueprint from './ImplementationBlueprint';
 import ValidationReportDisplay from './ValidationReportDisplay';
 import KnowledgeRegistryDisplay from './KnowledgeRegistryDisplay';
+import UnifierToolDisplay from './UnifierToolDisplay';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 
 interface ConsolidatedDocsDisplayProps {
@@ -14,11 +15,12 @@ interface ConsolidatedDocsDisplayProps {
   onShowExportModal: () => void;
   onGenerateVisuals: () => void;
   onRunValidation: () => void;
+  onRunUnifier: (explicitExtractions: string[]) => Promise<void>;
   onAskArchitect: () => void;
   loading: boolean;
 }
 
-const ConsolidatedDocsDisplay: React.FC<ConsolidatedDocsDisplayProps> = ({ docs, onShowExportModal, onGenerateVisuals, onRunValidation, onAskArchitect, loading }) => {
+const ConsolidatedDocsDisplay: React.FC<ConsolidatedDocsDisplayProps> = ({ docs, onShowExportModal, onGenerateVisuals, onRunValidation, onRunUnifier, onAskArchitect, loading }) => {
   const { state } = useWorkspace();
   const { currentWorkspace } = state;
   const artifacts = currentWorkspace?.knowledgeArtifacts || [];
@@ -78,6 +80,15 @@ const ConsolidatedDocsDisplay: React.FC<ConsolidatedDocsDisplayProps> = ({ docs,
 
         {artifacts.length > 0 && (
           <KnowledgeRegistryDisplay artifacts={artifacts} evolutionReports={evolutionReports} />
+        )}
+
+        {artifacts.length > 0 && (
+          <UnifierToolDisplay 
+            artifacts={artifacts} 
+            manifest={currentWorkspace?.unificationManifest} 
+            onGenerateManifest={onRunUnifier} 
+            loading={loading} 
+          />
         )}
 
         {hasVisuals ? (
