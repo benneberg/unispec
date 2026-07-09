@@ -66,13 +66,16 @@ const AppContent: React.FC = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       if (typeof event.target?.result === 'string') {
+        const tokenEstimate = Math.round(event.target.result.length / 4);
         dispatch({
           type: 'ADD_VARIANT',
           payload: {
             name: variantName || file.name,
             sourceType: 'upload',
             rawContent: event.target.result,
-            fileName: file.name
+            fileName: file.name,
+            tokenEstimate,
+            truncated: false
           }
         });
       }
@@ -104,16 +107,23 @@ const AppContent: React.FC = () => {
       }
 
       const cloneResult = await response.json();
+      const filesMap = cloneResult.files || {};
+      const rawContentStr = JSON.stringify(filesMap, null, 2);
+      const tokenEstimate = Math.round(rawContentStr.length / 4);
 
       dispatch({
         type: 'ADD_VARIANT',
         payload: {
           name: variantName || cleanRepo,
           sourceType: 'github',
-          rawContent: JSON.stringify(cloneResult.files, null, 2),
+          rawContent: rawContentStr,
           repoUrl,
           owner,
-          repo: cleanRepo
+          repo: cleanRepo,
+          tokenEstimate,
+          truncated: cloneResult.truncated,
+          hasCCC: cloneResult.hasCCC,
+          cccArtifacts: cloneResult.cccArtifacts
         }
       });
     } catch (err) {
@@ -603,6 +613,7 @@ const AppContent: React.FC = () => {
                     setShowQAModal(true);
                 }}
                 loading={loading}
+                apiConfig={apiConfig}
               />
             )}
             

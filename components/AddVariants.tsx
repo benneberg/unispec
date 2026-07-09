@@ -73,6 +73,12 @@ const AddVariants: React.FC<AddVariantsProps> = ({ onFileUpload, onGithubClone, 
               Initialize Repository Fetch
             </button>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider text-center">Cloud Ingress • Public Repos Only</p>
+            <div className="bg-purple-50/50 border border-purple-100 p-4 rounded-xl text-left space-y-1">
+              <span className="text-xs font-bold text-purple-700 block">💡 Pro-Tip: Context-Compressed Codebases (CCC)</span>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Pre-compile structured context in a <code className="font-mono bg-purple-100/50 text-purple-800 px-1 rounded">.llm-context/</code> directory inside your repository. UniSpec will automatically ingest these files to completely bypass standard extraction passes, offering instant, error-free merging.
+              </p>
+            </div>
           </div>
         );
       case 'manual':

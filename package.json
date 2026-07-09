@@ -15,6 +15,7 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "helmet": "^8.2.0",
+    "jszip": "^3.10.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-markdown": "^10.1.0",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/jszip": "^3.4.0",
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
     "esbuild": "^0.28.1",

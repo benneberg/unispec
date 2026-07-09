@@ -42,6 +42,24 @@ export interface ExtractedSpecs {
   };
 }
 
+export interface CCCArtifacts {
+  llmMd?: string | null;
+  publicApi?: string | null;
+  capabilities?: string | null;
+  dependencyGraph?: string | null;
+  typesExtracted?: string | null;
+  callGraph?: string | null;
+}
+
+export interface ExtractionBundle {
+  artifactId: string;
+  artifactName: string;
+  sourceVariant: string;
+  files: { path: string; content: string; role: 'primary' | 'dependency' | 'type' }[];
+  interfaceContract: string;
+  installNotes: string;
+}
+
 export interface Variant {
   id: string;
   name: string;
@@ -55,6 +73,10 @@ export interface Variant {
   knowledgeArtifacts?: KnowledgeArtifact[];
   extractionProgress: number; // 0: not started, 1: stage 1 done, etc.
   totalExtractionSteps: number; // 4 for file/manual, 5 for repo
+  tokenEstimate?: number;
+  truncated?: boolean;
+  hasCCC?: boolean;
+  cccArtifacts?: CCCArtifacts | null;
 }
 
 export interface Workspace {
@@ -110,6 +132,14 @@ export interface ValidationReport {
 }
 
 
+export interface ProvenanceEntry {
+  section: string;
+  sourceVariant: string;
+  originalFile?: string;
+  justification: string;
+  confidence: number; // 0.0 to 1.0
+}
+
 export interface ConsolidatedDocs {
   prd?: string;
   architecture?: string;
@@ -121,6 +151,7 @@ export interface ConsolidatedDocs {
   architectureDiagrams?: ArchitectureDiagrams;
   implementationBlueprint?: ImplementationBlueprint;
   validationReport?: ValidationReport;
+  provenance?: ProvenanceEntry[];
 }
 
 export interface Conflict {

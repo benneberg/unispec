@@ -57,26 +57,26 @@ This file tracks the completed core milestones of UniSpec, as well as the open v
 ## Open Validation Readiness Milestones (New Roadmap Tasks)
 
 ### Phase 7 — Fix the Context Exhaustion Problem
-- [ ] **[Phase 1.1]** Build a deterministic, non-LLM `ContentCompressor` utility in `server.ts` with `/api/compress` endpoint to create skeletons of file maps.
-- [ ] **[Phase 1.2]** Wire the compressor into `llmService.ts` for `runRepositorySummary` and `runLowLevelExtraction` calls to stay within standard token budgets.
-- [ ] **[Phase 1.3]** Add a per-variant token budget display in the UI (`VariantCard.tsx`) showing estimated token cost and truncation status.
+- [x] **[Phase 1.1]** Build a deterministic, non-LLM `ContentCompressor` utility in `server.ts` with `/api/compress` endpoint to create skeletons of file maps.
+- [x] **[Phase 1.2]** Wire the compressor into `llmService.ts` for `runRepositorySummary` and `runLowLevelExtraction` calls to stay within standard token budgets.
+- [x] **[Phase 1.3]** Add a per-variant token budget display in the UI (`VariantCard.tsx`) showing estimated token cost and truncation status.
 
 ### Phase 8 — Close the Extraction Gap (Real Code Output)
-- [ ] **[Phase 2.1]** Implement `filePaths` resolution to the manifest and define `ExtractionBundle` type structures.
-- [ ] **[Phase 2.2]** Add `/api/extract-bundle` endpoint in `server.ts` to extract actual file content and compile LLM interface usage contracts & install notes.
-- [ ] **[Phase 2.3]** Implement "Export Bundle" buttons in `UnifierToolDisplay.tsx` to generate client-side downloadable ZIP bundles using `JSZip` containing source files, contract `README.md`, and provenance references.
+- [x] **[Phase 2.1]** Implement `filePaths` resolution to the manifest and define `ExtractionBundle` type structures.
+- [x] **[Phase 2.2]** Add `/api/extract-bundle` endpoint in `server.ts` to extract actual file content and compile LLM interface usage contracts & install notes.
+- [x] **[Phase 2.3]** Implement "Export Bundle" buttons in `UnifierToolDisplay.tsx` to generate client-side downloadable ZIP bundles using `JSZip` containing source files, contract `README.md`, and provenance references.
 
 ### Phase 9 — Add a Provenance Map to Merged Output
-- [ ] **[Phase 3.1]** Extend `ConsolidatedDocs` and types with structured `ProvenanceEntry[]` tracking.
-- [ ] **[Phase 3.2]** Update master consolidation prompts to emit strict JSON `provenance` arrays mapping sections back to sources.
-- [ ] **[Phase 3.3]** Build an interactive "Provenance Map" visual table tab or collapsible panel in `ConsolidatedDocsDisplay.tsx`.
+- [x] **[Phase 3.1]** Extend `ConsolidatedDocs` and types with structured `ProvenanceEntry[]` tracking.
+- [x] **[Phase 3.2]** Update master consolidation prompts to emit strict JSON `provenance` arrays mapping sections back to sources.
+- [x] **[Phase 3.3]** Build an interactive "Provenance Map" visual table tab or collapsible panel in `ConsolidatedDocsDisplay.tsx`.
 
 ### Phase 10 — CCC Integration (Optional Path)
-- [ ] **[Phase 4.1]** Enhance `/api/github/clone` in `server.ts` to detect `.llm-context/` directory and return CCC artifacts.
-- [ ] **[Phase 4.2]** Support `cccArtifacts` and `hasCCC` properties on the client-side `Variant` type.
-- [ ] **[Phase 4.3]** Wire pipeline passes in `llmService.ts` to consume pre-compiled CCC contexts directly, bypassing Pass 1 completely when available.
-- [ ] **[Phase 4.4]** Show "CCC ✓" badges on `VariantCard.tsx` when pre-compiled assets are present.
-- [ ] **[Phase 4.5]** Provide dynamic helper guidelines in `WorkspaceSetup.tsx` suggesting CCC pre-instrumentation for external repositories.
+- [x] **[Phase 4.1]** Enhance `/api/github/clone` in `server.ts` to detect `.llm-context/` directory and return CCC artifacts.
+- [x] **[Phase 4.2]** Support `cccArtifacts` and `hasCCC` properties on the client-side `Variant` type.
+- [x] **[Phase 4.3]** Wire pipeline passes in `llmService.ts` to consume pre-compiled CCC contexts directly, bypassing Pass 1 completely when available.
+- [x] **[Phase 4.4]** Show "CCC ✓" badges on `VariantCard.tsx` when pre-compiled assets are present.
+- [x] **[Phase 4.5]** Provide dynamic helper guidelines in `AddVariants.tsx` suggesting CCC pre-instrumentation for external repositories.
 
 ### Phase 11 — Validation Testing Prep
 - [ ] **[Phase 5.1]** Create a Pipeline Cost Estimator modal/warning showing expected variants, estimated token counts, and API costs.

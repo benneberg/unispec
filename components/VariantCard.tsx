@@ -35,6 +35,11 @@ const VariantCard: React.FC<VariantCardProps> = ({ variant, onDelete, onExtract,
                 Verified
               </span>
             )}
+            {variant.hasCCC && (
+              <span className="ml-2 px-2 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-600 text-[10px] font-bold uppercase tracking-wider rounded-md" title="Pre-compiled Code Context Compiler (CCC) artifacts detected!">
+                CCC ✓
+              </span>
+            )}
           </div>
         </div>
         <div className="flex gap-2 self-end sm:self-center">
@@ -59,6 +64,21 @@ const VariantCard: React.FC<VariantCardProps> = ({ variant, onDelete, onExtract,
           <div className="mt-4">
               <AnalysisProgress progress={variant.extractionProgress} totalSteps={variant.totalExtractionSteps} />
           </div>
+      )}
+      {variant.tokenEstimate !== undefined && (
+        <div className="mt-4 flex items-center gap-2 text-xs text-slate-500 bg-slate-50 border border-slate-100 rounded-lg px-3 py-2">
+          <span className="font-semibold text-slate-700">Estimated Workspace Context:</span>
+          <span>{variant.tokenEstimate.toLocaleString()} tokens</span>
+          {variant.truncated ? (
+            <span className="ml-auto bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded">
+              Truncated
+            </span>
+          ) : (
+            <span className="ml-auto bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded">
+              Within Budget
+            </span>
+          )}
+        </div>
       )}
     </div>
   );

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { type KnowledgeArtifact } from '../knowledge/types';
 import { type UnificationManifest } from '../tools/unifier/types';
+import { type ApiConfig } from '../types';
+import { useWorkspace } from '../contexts/WorkspaceContext';
+import JSZip from 'jszip';
 import { 
   GitMerge, Sparkles, Loader2, Info, AlertTriangle, 
   CheckCircle, FileCode, Copy, Download, Box, 
@@ -13,6 +16,7 @@ interface UnifierToolDisplayProps {
   onGenerateManifest: (explicitExtractions: string[]) => Promise<void>;
   loading: boolean;
   loadingMessage?: string;
+  apiConfig: ApiConfig;
 }
 
 const UnifierToolDisplay: React.FC<UnifierToolDisplayProps> = ({
@@ -20,11 +24,16 @@ const UnifierToolDisplay: React.FC<UnifierToolDisplayProps> = ({
   manifest,
   onGenerateManifest,
   loading,
-  loadingMessage = 'Unifying variants...'
+  loadingMessage = 'Unifying variants...',
+  apiConfig
 }) => {
+  const { state } = useWorkspace();
+  const { currentWorkspace } = state;
+
   const [selectedExtractions, setSelectedExtractions] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'decisions' | 'standalone' | 'warnings' | 'json'>('decisions');
   const [isCopied, setIsCopied] = useState(false);
+  const [extractingBundleId, setExtractingBundleId] = useState<string | null>(null);
 
   const toggleExtraction = (id: string) => {
     setSelectedExtractions(prev => 
@@ -34,6 +43,87 @@ const UnifierToolDisplay: React.FC<UnifierToolDisplayProps> = ({
 
   const handleRunUnifier = () => {
     onGenerateManifest(selectedExtractions);
+  };
+
+  const handleExportBundle = async (mod: { artifactId: string; reason: string }) => {
+    if (!currentWorkspace || !apiConfig) return;
+    setExtractingBundleId(mod.artifactId);
+
+    try {
+      const artifact = artifacts.find(a => a.id === mod.artifactId);
+      if (!artifact) {
+        throw new Error(`Artifact ${mod.artifactId} not found in the registry.`);
+      }
+
+      const sourceVariantId = artifact.implementations?.[0]?.repositoryId;
+      const sourceVariant = currentWorkspace.variants.find(v => v.id === sourceVariantId || v.name === sourceVariantId);
+      if (!sourceVariant) {
+        throw new Error(`Source variant for artifact ${artifact.name} is missing.`);
+      }
+
+      let variantFiles: Record<string, string> = {};
+      try {
+        variantFiles = JSON.parse(sourceVariant.rawContent);
+      } catch (e) {
+        variantFiles = { [sourceVariant.fileName || 'spec.md']: sourceVariant.rawContent };
+      }
+
+      const response = await fetch('/api/extract-bundle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ artifact, variantFiles, apiConfig })
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || `Server extraction failed with status ${response.status}`);
+      }
+
+      const bundleResult = await response.json();
+      const zip = new JSZip();
+
+      const codeFolder = zip.folder('src');
+      for (const file of bundleResult.files || []) {
+        const relativePath = file.path.replace(/^(src\/|lib\/|components\/)/, '');
+        codeFolder?.file(relativePath, file.content);
+      }
+
+      const readmeContent = `
+# Independent Decoupled Module: ${bundleResult.artifactName}
+
+## Purpose
+${artifact.purpose}
+
+---
+
+## Interface Contract (Consumption Details)
+${bundleResult.interfaceContract}
+
+---
+
+## Installation & Environment Configuration
+${bundleResult.installNotes}
+
+---
+
+*Isolated & compiled automatically by UniSpec Unified Portfolio Integrator.*
+`;
+      zip.file('README.md', readmeContent.trim());
+
+      const content = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(content);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${bundleResult.artifactName.toLowerCase().replace(/\s+/g, '-')}-standalone-package.zip`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+    } catch (e) {
+      console.error(e);
+      alert(e instanceof Error ? e.message : 'Failed to export standalone package.');
+    } finally {
+      setExtractingBundleId(null);
+    }
   };
 
   const handleCopyJson = () => {
@@ -284,12 +374,31 @@ const UnifierToolDisplay: React.FC<UnifierToolDisplayProps> = ({
                       </div>
                     ) : (
                       manifest.extractedStandaloneModules.map((mod, idx) => (
-                        <div key={idx} className="bg-slate-900 p-4 rounded-lg border border-slate-800 flex items-start gap-3">
-                          <CheckCircle className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <span className="text-xs font-bold text-slate-200">{mod.artifactId}</span>
-                            <p className="text-xs text-slate-400 mt-1 italic">"{mod.reason}"</p>
+                        <div key={idx} className="bg-slate-900 p-4 rounded-lg border border-slate-800 flex items-center justify-between gap-3">
+                          <div className="flex items-start gap-3">
+                            <CheckCircle className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <span className="text-xs font-bold text-slate-200">{mod.artifactId}</span>
+                              <p className="text-xs text-slate-400 mt-1 italic">"{mod.reason}"</p>
+                            </div>
                           </div>
+                          <button
+                            onClick={() => handleExportBundle(mod)}
+                            disabled={extractingBundleId !== null}
+                            className="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600 border border-purple-500/20 hover:border-purple-500 text-purple-300 hover:text-white rounded-lg text-[11px] font-bold transition-all flex items-center gap-1.5 disabled:opacity-40 flex-shrink-0"
+                          >
+                            {extractingBundleId === mod.artifactId ? (
+                              <>
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                <span>Exporting...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Download className="w-3.5 h-3.5" />
+                                <span>Export Package</span>
+                              </>
+                            )}
+                          </button>
                         </div>
                       ))
                     )}

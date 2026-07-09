@@ -2,7 +2,7 @@
 import React from 'react';
 import Markdown from 'react-markdown';
 import { Download, Loader2, MessageSquare, ShieldCheck } from './Icons';
-import { type ConsolidatedDocs } from '../types';
+import { type ConsolidatedDocs, type ApiConfig } from '../types';
 import ArchitectureDiagrams from './ArchitectureDiagrams';
 import ImplementationBlueprint from './ImplementationBlueprint';
 import ValidationReportDisplay from './ValidationReportDisplay';
@@ -18,9 +18,10 @@ interface ConsolidatedDocsDisplayProps {
   onRunUnifier: (explicitExtractions: string[]) => Promise<void>;
   onAskArchitect: () => void;
   loading: boolean;
+  apiConfig: ApiConfig;
 }
 
-const ConsolidatedDocsDisplay: React.FC<ConsolidatedDocsDisplayProps> = ({ docs, onShowExportModal, onGenerateVisuals, onRunValidation, onRunUnifier, onAskArchitect, loading }) => {
+const ConsolidatedDocsDisplay: React.FC<ConsolidatedDocsDisplayProps> = ({ docs, onShowExportModal, onGenerateVisuals, onRunValidation, onRunUnifier, onAskArchitect, loading, apiConfig }) => {
   const { state } = useWorkspace();
   const { currentWorkspace } = state;
   const artifacts = currentWorkspace?.knowledgeArtifacts || [];
@@ -78,6 +79,60 @@ const ConsolidatedDocsDisplay: React.FC<ConsolidatedDocsDisplayProps> = ({ docs,
             </div>
         </div>
 
+        {docs.provenance && docs.provenance.length > 0 && (
+          <div className="bg-slate-800/50 rounded-xl p-6 border border-teal-500/20 space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-bold flex items-center gap-2 text-teal-400">
+                <span className="p-1.5 rounded-lg bg-teal-500/10 text-teal-400">🔍</span>
+                Interactive Provenance Map
+              </h3>
+              <span className="px-2.5 py-1 bg-teal-500/10 text-teal-400 border border-teal-500/20 text-xs font-bold rounded-lg">
+                {docs.provenance.length} traced mappings
+              </span>
+            </div>
+            <p className="text-sm text-slate-300">
+              Traces final master requirements, specifications, and architecture decisions back to their exact component origins across variants with architectural justification.
+            </p>
+
+            <div className="overflow-x-auto border border-slate-700/50 rounded-xl">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-900 border-b border-slate-700/50 text-xs text-slate-400 uppercase tracking-wider font-semibold">
+                    <th className="p-4">Target Section</th>
+                    <th className="p-4">Source Variant</th>
+                    <th className="p-4">Original Resource/File</th>
+                    <th className="p-4">Merge Justification</th>
+                    <th className="p-4 text-right">Match Certainty</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-700/50 text-sm">
+                  {docs.provenance.map((entry, idx) => (
+                    <tr key={idx} className="hover:bg-slate-700/20 transition-all">
+                      <td className="p-4 font-bold text-teal-400 capitalize">{entry.section}</td>
+                      <td className="p-4">
+                        <span className="px-2.5 py-1 bg-slate-900 text-slate-200 border border-slate-700/50 rounded-lg text-xs font-semibold">
+                          {entry.sourceVariant}
+                        </span>
+                      </td>
+                      <td className="p-4 font-mono text-xs text-slate-300">{entry.originalFile || 'N/A'}</td>
+                      <td className="p-4 text-slate-300 leading-relaxed max-w-sm">{entry.justification}</td>
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <span className={`text-xs font-black px-1.5 py-0.5 rounded ${
+                            entry.confidence >= 0.8 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                          }`}>
+                            {Math.round(entry.confidence * 100)}%
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {artifacts.length > 0 && (
           <KnowledgeRegistryDisplay artifacts={artifacts} evolutionReports={evolutionReports} />
         )}
@@ -88,6 +143,7 @@ const ConsolidatedDocsDisplay: React.FC<ConsolidatedDocsDisplayProps> = ({ docs,
             manifest={currentWorkspace?.unificationManifest} 
             onGenerateManifest={onRunUnifier} 
             loading={loading} 
+            apiConfig={apiConfig}
           />
         )}
 
